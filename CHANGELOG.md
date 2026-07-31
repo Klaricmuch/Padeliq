@@ -5,6 +5,26 @@ the change and the decision/reasoning behind it, so the history travels with the
 
 ---
 
+## 2026-07-31 — /clubs rebuilt as a B2B page (AI Coach Bruno)
+
+- Rebuilt `/clubs` from the duplicated homepage into a **B2B landing page for padel club
+  owners**, branded **AI Coach Bruno** (distinct from the player-facing homepage). Sections:
+  hero (pilot eyebrow, "Bruno explains it." in the coral gradient, two CTAs, trust strip),
+  What your members get (6 cards, the club card highlighted), What the club gets (4 cards),
+  How it works (3 steps), a plain integration panel, a pilot-pricing panel with a
+  Name/Club/Courts/Email demo form, and a 9-question clubs FAQ. Live at
+  https://brunopadel.app/clubs.
+  - *Reused* the existing dark design system, the session-player mockup and the court-grid
+    background — no new dependencies; still one self-contained file.
+  - *Copy decisions (from the brief):* first mention "AI Coach Bruno", plain "Bruno"
+    afterwards; Bruno watches/reads/measures/shows, never "recommends" or "advises". Audience
+    order preserved: what members get → club effort → euros. Pilot price kept as the brief's
+    `€X` placeholder (not invented). Em-dash shorthand in the brief was rendered as card
+    title + body, consistent with the standing no-em-dash-in-copy preference.
+  - *Front-end only:* the demo form shows a thank-you on submit; no backend is wired yet.
+
+---
+
 ## 2026-07-31 — /clubs page
 
 - **Duplicated the landing page to `/clubs`.** Served from `clubs/index.html` — Vercel maps
