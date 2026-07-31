@@ -5,6 +5,17 @@ the change and the decision/reasoning behind it, so the history travels with the
 
 ---
 
+## 2026-07-31 — /clubs page
+
+- **Duplicated the landing page to `/clubs`.** Served from `clubs/index.html` — Vercel maps
+  a folder's `index.html` to the clean path `/clubs` automatically, so no `vercel.json`
+  rewrite was needed. Live at https://brunopadel.app/clubs.
+  - *Status:* currently a byte-for-byte copy of the root page — a starting point to tailor
+    for a clubs-specific audience. The page is fully self-contained (inline CSS/JS, no
+    relative assets), so it works unchanged under the `/clubs` path.
+
+---
+
 ## 2026-07-31 — Custom domain
 
 - **Connected custom domain `brunopadel.app`** (registered at Porkbun) to the `padeliq`
