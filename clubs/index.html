@@ -3,7 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PadelIQ · AI video analysis for padel (dark)</title>
+<title>AI Coach Bruno · AI video analysis for padel clubs</title>
+<meta name="description" content="AI Coach Bruno turns the video your padel courts already record into a real match analysis for your members. Nothing to install, nothing for your staff to do. Pilot places open in Lisboa, Cascais and Caparica.">
+<meta name="robots" content="index,follow">
 <style>
   /* =========================================================
      PadelIQ — landing page  ·  DARK VARIANT (generated from padel-landing.html)
@@ -446,14 +448,15 @@
 <!-- ===================== NAV ===================== -->
 <header class="nav" id="nav">
   <div class="wrap bar">
-    <a class="logo" href="#top"><span class="mark"></span>Padel<b>IQ</b></a>
+    <a class="logo" href="#top"><span class="mark"></span>AI Coach <b>Bruno</b></a>
     <nav class="nav-links">
-      <a href="#metrics">Metrics</a>
+      <a href="#members">For members</a>
       <a href="#how">How it works</a>
-      <a href="#trust">Accuracy</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#faq">FAQ</a>
     </nav>
     <div class="nav-cta">
-      <a class="btn primary" href="#waitlist">Request early access</a>
+      <a class="btn primary" href="#pricing">Book a demo</a>
     </div>
   </div>
 </header>
@@ -578,21 +581,69 @@
     .dk-hud-r { flex-direction: column; }
   }
 </style>
+<style id="clubs-extra">
+  /* ---- clubs (B2B) additions ---- */
+  .hero-cta { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 14px; }
+  .btn.xl { padding: 14px 26px; font-size: 15px; }
+  .hero-trust { max-width: 900px; margin: 34px auto 0; text-align: center;
+    font-size: 11.5px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--ink-faint); line-height: 1.9; }
+
+  /* 2-col card grid (what the club gets) */
+  .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+  @media (max-width: 760px) { .grid-2 { grid-template-columns: 1fr; } }
+  .bcard { padding: 28px 26px; }
+  .bcard h3 { font-size: 18px; margin-bottom: 9px; }
+  .bcard p { font-size: 14.5px; color: var(--ink-soft); line-height: 1.6; }
+
+  /* highlighted (gradient) card treatment */
+  .metric.feature, .bcard.feature {
+    background: linear-gradient(150deg, rgba(255,61,129,0.18), rgba(255,106,61,0.10));
+    border-color: rgba(255,106,61,0.34);
+  }
+  .metric.feature h3, .bcard.feature h3 { color: #fff; }
+
+  /* integration panel (plain, centered) */
+  .integrate { max-width: 720px; margin: 0 auto; text-align: center; padding: 40px 40px 38px; }
+  .integrate h3 { font-size: clamp(20px, 2.4vw, 26px); margin-bottom: 14px; }
+  .integrate p { font-size: 16px; color: var(--ink-2); line-height: 1.65; }
+
+  /* pricing gradient-edged card */
+  .price-card { position: relative; max-width: 760px; margin: 0 auto; text-align: center;
+    padding: 46px 40px 42px; overflow: hidden; }
+  .price-card::before { content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1.5px;
+    background: linear-gradient(120deg, var(--accent), var(--accent-2) 52%, var(--court-blue));
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none; }
+  .price-card h2 { font-size: clamp(26px, 3.2vw, 38px); margin: 12px 0 14px; }
+  .price-card .price-lede { font-size: 16px; color: var(--ink-2); max-width: 580px; margin: 0 auto 28px; line-height: 1.6; }
+  .price-form { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; max-width: 560px; margin: 0 auto; text-align: left; }
+  .price-form .full { grid-column: 1 / -1; }
+  .price-form label { display: block; font-size: 12px; font-weight: 650; color: var(--ink-soft); margin-bottom: 6px; letter-spacing: .02em; }
+  .price-form input { width: 100%; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--border);
+    background: rgba(24,14,36,0.9); color: var(--ink); font-size: 14.5px; font-family: inherit; }
+  .price-form input:focus { outline: none; border-color: var(--accent-2); }
+  .price-form .submit-row { grid-column: 1 / -1; margin-top: 4px; }
+  .price-form .submit-row .btn { width: 100%; }
+  .price-success { display: none; margin-top: 18px; font-size: 15px; font-weight: 600; color: var(--court-blue); }
+  .price-form.done { display: none; }
+  .price-form.done + .price-success { display: block; }
+  @media (max-width: 560px) { .price-form { grid-template-columns: 1fr; } }
+</style>
 <!-- ===================== HERO (showpiece · message first, video showpiece second) ===================== -->
 <section class="hero dk-hero" id="top">
   <canvas id="scene"></canvas>
   <canvas id="scene-fg"></canvas>
   <div class="wrap">
     <div class="dk-msg reveal">
-      <div class="badge"><span class="dot"></span> MVP live · onboarding first players</div>
-      <h1>See your padel game the way a <span class="grad">coach</span> does.</h1>
-      <p class="lede">Upload one clip from a single camera. PadelIQ tracks the ball in real time, measuring bounces, shot speed and rally tempo, then hands back the read a coach would give you.</p>
-      <form class="hero-form" id="heroForm">
-          <input type="email" placeholder="you@email.com" aria-label="Email" required>
-          <button class="btn primary" type="submit">Get early access</button>
-        </form>
-        <p class="form-success">✓ You're on the list. We'll be in touch.</p>
-        <p class="hero-note">No app · works with the camera you already own · free during beta.</p>
+      <div class="badge"><span class="dot"></span> For clubs · Pilot places open · Lisboa, Cascais, Caparica</div>
+      <h1>Your cameras already record every match. <span class="grad">Bruno explains it.</span></h1>
+      <p class="lede">AI Coach Bruno turns the video your courts already capture into a real match analysis for the players in it: ball speed, bounce maps, rally tempo, wall play. Nothing to install, nothing for your staff to do, nothing to change about how you run the club.</p>
+      <div class="hero-cta">
+        <a class="btn primary xl" href="#pricing">Book a 15-minute demo</a>
+        <a class="btn ghost xl" href="#demo">See a real session →</a>
+      </div>
+      <p class="hero-note">Bruno works with the camera system you already have. If you don't have one yet, we mount one on a single court for the pilot.</p>
     </div>
     <div class="dk-proof reveal">
       <div class="dk-eyebrow"><span class="rec-dot"></span> Real footage · real tracking · real numbers</div>
@@ -644,164 +695,199 @@
       </div>
     </div>
   </div>
-  <a class="scroll-cue" href="#metrics" aria-label="Scroll">↓</a>
+  <div class="wrap"><p class="hero-trust reveal">We don't do bookings · We don't replace your court software · Bruno sits on top of the video you already record</p></div>
+  <a class="scroll-cue" href="#members" aria-label="Scroll">↓</a>
 </section>
-<!-- ===================== METRICS ===================== -->
-<section class="section-pad" id="metrics">
+<!-- ===================== SECTION 1 · WHAT MEMBERS GET ===================== -->
+<section class="section-pad" id="members">
   <div class="wrap">
     <div class="section-head reveal">
-      <span class="eyebrow">What you get</span>
-      <h2>Five metrics that read the game like a coach</h2>
-      <p>Every number is measured from the real ball track and your calibrated court,
-         not guessed, not gamified.</p>
+      <span class="eyebrow">What your members get</span>
+      <h2>Every match ends with a link they actually open.</h2>
+      <p>Recorded video gets watched once. A match where Bruno tells them why they lost the
+         long rallies gets watched, paused, and sent to the other three players.</p>
     </div>
 
     <div class="metrics-grid">
       <div class="metric glass reveal">
-        <span class="tag">Live</span>
         <div class="ico">
           <svg viewBox="0 0 24 24" fill="none" stroke="#e8743c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
             <rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="15" r="2.2"/><circle cx="15" cy="9" r="1.4"/><circle cx="16.5" cy="15.5" r="1"/>
           </svg>
         </div>
         <h3>Bounce heatmap</h3>
-        <p>See exactly where the ball is landing, floor and glass, as a heat map over the court. Spot the patterns opponents can't.</p>
+        <p>Where every ball actually landed, floor and glass, mapped onto your court.</p>
       </div>
 
       <div class="metric glass reveal d1">
-        <span class="tag">Live</span>
         <div class="ico">
           <svg viewBox="0 0 24 24" fill="none" stroke="#e8743c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
             <path d="M4 19V5M4 12h13"/><path d="M14 8l4 4-4 4"/>
           </svg>
         </div>
         <h3>Shot depth</h3>
-        <p>How deep your shots are landing relative to the baseline and net, the single biggest lever between club and pro rallies.</p>
+        <p>How deep their shots land relative to baseline and net. The single biggest gap between club and pro rallies.</p>
       </div>
 
       <div class="metric glass reveal d2">
-        <span class="tag">Live</span>
         <div class="ico">
           <svg viewBox="0 0 24 24" fill="none" stroke="#e8743c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
             <path d="M13 3L5 14h5l-1 7 8-11h-5z"/>
           </svg>
         </div>
         <h3>Speed bands</h3>
-        <p>Every shot sorted into speed bands calibrated to your own match, so slow, medium, fast and smash mean something real, not a random km/h.</p>
+        <p>Every shot sorted into speed bands calibrated to your court. Real km/h, not a gamified score.</p>
       </div>
 
       <div class="metric glass reveal">
-        <span class="tag">Live</span>
         <div class="ico">
           <svg viewBox="0 0 24 24" fill="none" stroke="#e8743c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
             <rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 4v16M21 4v16"/><path d="M7 8v8M17 8v8"/>
           </svg>
         </div>
         <h3>Wall &amp; glass usage</h3>
-        <p>How often you're playing the back and side glass, the part of padel that separates players who use the whole court from those who don't.</p>
+        <p>How much of the back and side glass they're really using, the part of padel that separates levels.</p>
       </div>
 
       <div class="metric glass reveal d1">
-        <span class="tag">Live</span>
         <div class="ico">
           <svg viewBox="0 0 24 24" fill="none" stroke="#e8743c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
             <path d="M3 12h4l2 6 4-14 2 8h6"/>
           </svg>
         </div>
         <h3>Rally length &amp; tempo</h3>
-        <p>Shots per rally and the tempo between contacts. Read your endurance, your patience, and who's really controlling the point.</p>
+        <p>Shots per rally and time between contacts. Endurance, patience, and who was controlling the point.</p>
       </div>
 
-      <div class="metric glass reveal d2" style="background:linear-gradient(150deg, rgba(63,127,176,0.10), rgba(255,255,255,0.62));">
-        <span class="tag" style="color:var(--court-blue);background:rgba(63,127,176,0.1);border-color:rgba(63,127,176,0.22);">Next</span>
-        <div class="ico" style="background:linear-gradient(140deg, rgba(63,127,176,0.16), rgba(63,127,176,0.1));border-color:rgba(63,127,176,0.2);">
-          <svg viewBox="0 0 24 24" fill="none" stroke="var(--court-blue)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="7" r="3"/><path d="M6 21v-2a6 6 0 0 1 12 0v2"/>
+      <div class="metric glass reveal d2 feature">
+        <div class="ico">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#e8743c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 10.5l6.8-4M8.6 13.5l6.8 4"/>
           </svg>
         </div>
-        <h3>Player movement &amp; positioning</h3>
-        <p>Court coverage, positioning and movement per player, in active development, next to land in your session view.</p>
+        <h3>Your club, on every session</h3>
+        <p>Your name and colours on the analysis your members share in their group chat.</p>
       </div>
     </div>
   </div>
 </section>
-<!-- ===================== DISCOVER (questions) ===================== -->
-<section class="section-pad" id="discover">
+<!-- ===================== SECTION 2 · WHAT THE CLUB GETS ===================== -->
+<section class="section-pad" id="club">
   <div class="wrap">
     <div class="section-head reveal">
-      <span class="eyebrow">After every match</span>
-      <h2>You'll finally discover&#8230;</h2>
-      <p>Players think in questions, not measurements. Each analysis answers the
-         ones you actually ask walking off the court.</p>
+      <span class="eyebrow">What the club gets</span>
+      <h2>The perk your members talk about. The workload of nothing.</h2>
     </div>
-    <div class="qgrid">
-      <article class="qcard glass reveal" style="--qa:var(--accent-2)"><span class="qmark">?</span><h3>Why am I losing long rallies?</h3><p class="qsub">Rally intelligence</p><ul class="qlist"><li>Rally length &amp; count</li><li>Tempo under pressure</li><li>When patterns break down</li></ul></article>
-      <article class="qcard glass reveal d1" style="--qa:var(--court-blue)"><span class="qmark">?</span><h3>Where do my shots actually land?</h3><p class="qsub">Bounce &amp; depth maps</p><ul class="qlist"><li>Too short</li><li>Too central</li><li>Too safe</li></ul></article>
-      <article class="qcard glass reveal d2" style="--qa:var(--green)"><span class="qmark">?</span><h3>Am I attacking enough?</h3><p class="qsub">Aggression profile</p><ul class="qlist"><li>Shot-speed bands</li><li>Smash frequency</li><li>Winners vs. safe balls</li></ul></article>
-      <article class="qcard glass reveal d1" style="--qa:var(--accent)"><span class="qmark">?</span><h3>Am I using the glass correctly?</h3><p class="qsub">Court &amp; wall usage</p><ul class="qlist"><li>Wall play</li><li>Bounce locations</li><li>Recovery quality</li></ul></article>
+    <div class="grid-2">
+      <div class="bcard glass reveal">
+        <h3>A reason for members to book the recorded court</h3>
+        <p>Video alone is a novelty. Video with a coach's read is a reason to pick the court with the camera, and to come back.</p>
+      </div>
+      <div class="bcard glass reveal d1">
+        <h3>Something your coaches can teach with</h3>
+        <p>Your academy gets an objective before-and-after. Depth and speed bands move over eight weeks, and the player can see it. Bruno handles the measuring so your coaches spend the hour coaching.</p>
+      </div>
+      <div class="bcard glass reveal d1">
+        <h3>A difference your neighbours can't quote</h3>
+        <p>Every club within ten minutes has the same courts, the same lighting and roughly the same price. None of them have a coach on every court.</p>
+      </div>
+      <div class="bcard glass reveal d2">
+        <h3>Zero operational load</h3>
+        <p>No new screens for your staff. No one at reception to train. Matches come in from the camera, sessions go out to the players. You never touch it.</p>
+      </div>
     </div>
   </div>
 </section>
-<!-- ===================== HOW IT WORKS ===================== -->
+<!-- ===================== SECTION 3 · HOW IT WORKS ===================== -->
 <section class="section-pad" id="how" style="background:linear-gradient(180deg, rgba(120,150,190,0) 0%, rgba(120,150,190,0.05) 40%, rgba(120,150,190,0) 100%);">
   <div class="wrap">
     <div class="section-head reveal">
       <span class="eyebrow">How it works</span>
-      <h2>Three steps. One camera. Zero setup.</h2>
-      <p>No sensors, no wearables, no fixed rig. Just the footage you'd film anyway.</p>
+      <h2>Three steps. Your camera. Your court. Zero setup.</h2>
     </div>
     <div class="steps">
       <div class="step glass reveal">
         <div class="num">1</div>
-        <h3>Upload your clip</h3>
-        <p>Drop in a video from a phone or a court camera. Trim to the rally you care about, or send the whole match.</p>
-        <div class="meta">Any single-camera angle</div>
+        <h3>Point Bruno at your footage</h3>
+        <p>Whatever you already use: cloud recordings, a fixed cam, an NVR export. No camera yet? We mount one on a single court for the pilot.</p>
+        <div class="meta">Works with your existing video</div>
       </div>
       <div class="step glass reveal d1">
         <div class="num">2</div>
-        <h3>We track &amp; calibrate</h3>
-        <p>PadelIQ finds the ball frame by frame and locks onto your court's four corners, building a true 3D model of the play space.</p>
-        <div class="meta">3D ball track + court solve</div>
+        <h3>He learns your court once</h3>
+        <p>Because your camera doesn't move, Bruno locks onto the four corners a single time and builds a true 3D model of your play space. Every match after that is automatic.</p>
+        <div class="meta">One-time court calibration</div>
       </div>
       <div class="step glass reveal d2">
         <div class="num">3</div>
-        <h3>See your session</h3>
-        <p>An interactive session player: scrub the match, watch the heat build, and drill into every bounce, shot and rally.</p>
-        <div class="meta">Interactive session player</div>
+        <h3>Your members get their session</h3>
+        <p>A link after the match: scrub the video, watch the heat map build, drill into every bounce, shot and rally. Under your club's name.</p>
+        <div class="meta">Delivered within 24 hours during the pilot</div>
       </div>
     </div>
   </div>
 </section>
-<!-- ===================== FINAL CTA ===================== -->
-<section class="section-pad" id="waitlist" style="padding-top:20px;">
+<!-- ===================== SECTION 4 · INTEGRATION ===================== -->
+<section class="section-pad" id="integration" style="padding-top:20px;">
   <div class="wrap">
-    <div class="cta-final glass reveal">
-      <span class="eyebrow" style="justify-content:center;">Early access</span>
-      <h2>Be first on the court.</h2>
-      <p>We're onboarding a small group of players and clubs during the beta. Leave your email and we'll send an invite.</p>
-      <form class="cta-form" id="ctaForm">
-        <input type="email" placeholder="you@email.com" aria-label="Email" required>
-        <button class="btn primary" type="submit">Request an invite</button>
+    <div class="integrate glass reveal">
+      <h3>One court. One camera position. Thirty minutes.</h3>
+      <p>A fixed viewpoint of a single court, a way to reach the players who played on it
+         (email or WhatsApp is fine), and the club's consent notice for filming, we'll give
+         you the wording. That's the entire integration.</p>
+    </div>
+  </div>
+</section>
+<!-- ===================== SECTION 5 · PRICING / PILOT ===================== -->
+<section class="section-pad" id="pricing" style="padding-top:20px;">
+  <div class="wrap">
+    <div class="price-card glass reveal">
+      <span class="eyebrow" style="justify-content:center;">Pilot</span>
+      <h2>One court. One month. One price.</h2>
+      <p class="price-lede">We're putting Bruno on a small number of courts before the season restarts. €X per court, per month, month-to-month, cancel whenever. We film, he analyses, your members get their matches. If they don't open the links, you stop paying and we've both learned something.</p>
+      <form class="price-form" id="demoForm" onsubmit="event.preventDefault(); this.classList.add('done');">
+        <div>
+          <label for="pf-name">Name</label>
+          <input id="pf-name" type="text" autocomplete="name" required>
+        </div>
+        <div>
+          <label for="pf-club">Club</label>
+          <input id="pf-club" type="text" autocomplete="organization" required>
+        </div>
+        <div>
+          <label for="pf-courts">Number of courts</label>
+          <input id="pf-courts" type="number" min="1" inputmode="numeric" required>
+        </div>
+        <div>
+          <label for="pf-email">Email</label>
+          <input id="pf-email" type="email" autocomplete="email" required>
+        </div>
+        <div class="submit-row">
+          <button class="btn primary xl" type="submit">Book a demo</button>
+        </div>
       </form>
-      <p class="form-success">✓ You're on the list. We'll be in touch.</p>
+      <p class="price-success">✓ Thanks, we'll be in touch to schedule your demo.</p>
     </div>
   </div>
 </section>
 
-<!-- ===================== FAQ ===================== -->
+<!-- ===================== SECTION 6 · FAQ ===================== -->
 <section class="section-pad" id="faq" style="padding-top:20px;">
   <div class="wrap">
     <div class="section-head reveal">
       <span class="eyebrow">Questions</span>
-      <h2>Everything you're wondering.</h2>
+      <h2>What clubs ask first.</h2>
     </div>
     <div class="faq-list reveal">
-      <details class="faq"><summary>Can I record with my phone?<span class="faq-x">+</span></summary><p>Yes. A phone on a tripod or clipped to the fence is exactly what we designed for: one fixed camera, one angle.</p></details>
-      <details class="faq"><summary>How long does analysis take?<span class="faq-x">+</span></summary><p>Most clips come back in a few minutes. You upload, we track, you get your breakdown.</p></details>
-      <details class="faq"><summary>Does it work indoors?<span class="faq-x">+</span></summary><p>Yes, indoor and outdoor courts both work, as long as the four court corners are visible in the frame.</p></details>
-      <details class="faq"><summary>Can I upload doubles?<span class="faq-x">+</span></summary><p>Absolutely. The demo you see is a real doubles rally tracked end to end.</p></details>
-      <details class="faq"><summary>Do I need sensors or wearables?<span class="faq-x">+</span></summary><p>No. Everything comes from the video itself, with no watches, no ball sensors, no extra gear.</p></details>
-      <details class="faq"><summary>How accurate is it?<span class="faq-x">+</span></summary><p>Ball speed and bounces are measured from the tracked ball on a calibrated court, and low-confidence shots are flagged rather than guessed.</p></details>
+      <details class="faq"><summary>We already have cameras from another provider. Does Bruno work with them?<span class="faq-x">+</span></summary><p>Usually yes. If you can export or stream the footage, he can analyse it. Tell us what you run and we'll confirm before you commit to anything.</p></details>
+      <details class="faq"><summary>Do we have to buy hardware?<span class="faq-x">+</span></summary><p>No. If you don't have a camera, we supply and mount one for the pilot at our cost.</p></details>
+      <details class="faq"><summary>What about GDPR and player consent?<span class="faq-x">+</span></summary><p>Bruno analyses ball and court geometry, not faces. We give you the signage and booking-flow wording, players are told the court is filmed, and any player can ask for their session to be deleted.</p></details>
+      <details class="faq"><summary>Does this replace our booking system?<span class="faq-x">+</span></summary><p>No, and we don't want it to. No bookings, courts, payments or memberships. Bruno sits alongside whatever you already run.</p></details>
+      <details class="faq"><summary>How much work is it for our staff?<span class="faq-x">+</span></summary><p>After setup, none.</p></details>
+      <details class="faq"><summary>Does it work outdoors? At night?<span class="faq-x">+</span></summary><p>Yes, with adequate court lighting. We'll check your specific court from a short test clip before you pay anything.</p></details>
+      <details class="faq"><summary>What if our camera angle isn't ideal?<span class="faq-x">+</span></summary><p>Send us five minutes of footage. We'll tell you honestly whether it's good enough. We'd rather say no than deliver something weak.</p></details>
+      <details class="faq"><summary>How long until players get their match?<span class="faq-x">+</span></summary><p>Within 24 hours during the pilot.</p></details>
+      <details class="faq"><summary>Is Bruno a real coach?<span class="faq-x">+</span></summary><p>Bruno is AI. He measures what happened on court with numbers a coach would recognise. He doesn't replace the coach in your academy, he gives them something to work from.</p></details>
     </div>
   </div>
 </section>
@@ -809,10 +895,10 @@
 <!-- ===================== FOOTER ===================== -->
 <footer>
   <div class="wrap">
-    <div class="fl"><a class="logo" href="#top" style="font-size:16px;"><span class="mark" style="width:24px;height:24px;"></span>Padel<b>IQ</b></a></div>
+    <div class="fl"><a class="logo" href="#top" style="font-size:16px;"><span class="mark" style="width:24px;height:24px;"></span>AI Coach <b>Bruno</b></a></div>
     <div class="fr">
-      © <span id="yr"></span> PadelIQ · AI video analysis for padel
-      <div class="placeholder-note">"PadelIQ" is a placeholder brand name, swap it in the markup.</div>
+      AI Coach Bruno · © <span id="yr"></span> · AI video analysis for padel
+      <div class="placeholder-note"><a href="/" style="color:var(--court-blue);">For players → the AI Coach Bruno homepage</a></div>
     </div>
   </div>
 </footer>
