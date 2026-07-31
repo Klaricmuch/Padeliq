@@ -5,6 +5,19 @@ the change and the decision/reasoning behind it, so the history travels with the
 
 ---
 
+## 2026-07-31 — Custom domain
+
+- **Connected custom domain `brunopadel.app`** (registered at Porkbun) to the `padeliq`
+  Vercel project. Both the apex and `www.brunopadel.app` are attached to the project;
+  verified via the Vercel API that they resolve to `padeliq`, not another project.
+  - *Status:* Vercel side complete. Going live is pending one DNS change **at Porkbun**:
+    apex `A → 76.76.21.21` and `www CNAME → cname.vercel-dns.com` (replacing Porkbun's
+    parking records). Vercel auto-issues SSL once DNS resolves (`.app` forces HTTPS).
+  - *Note:* the domain name (`brunopadel.app`) intentionally differs from the project
+    name (`padeliq`) — a domain can front any project.
+
+---
+
 ## 2026-07-19 — Initial build, publish, and infrastructure
 
 ### Deployment & hosting
