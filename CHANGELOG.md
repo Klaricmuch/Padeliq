@@ -10,9 +10,16 @@ the change and the decision/reasoning behind it, so the history travels with the
 - **Connected custom domain `brunopadel.app`** (registered at Porkbun) to the `padeliq`
   Vercel project. Both the apex and `www.brunopadel.app` are attached to the project;
   verified via the Vercel API that they resolve to `padeliq`, not another project.
-  - *Status:* Vercel side complete. Going live is pending one DNS change **at Porkbun**:
-    apex `A → 76.76.21.21` and `www CNAME → cname.vercel-dns.com` (replacing Porkbun's
-    parking records). Vercel auto-issues SSL once DNS resolves (`.app` forces HTTPS).
+  - *Status:* **Live** as of 2026-07-31. DNS configured at Porkbun — apex
+    `A → 76.76.21.21` and `www CNAME → cname.vercel-dns.com`, replacing Porkbun's parking
+    ALIAS + wildcard CNAME. `www.brunopadel.app` is the primary; the apex 308-redirects to
+    `www`. Vercel auto-issued the SSL cert (`.app` is HSTS-preloaded, so HTTPS is
+    mandatory). Verified `https://brunopadel.app` and `https://www.brunopadel.app` both
+    return 200 and serve the page.
+  - *Gotcha for next time:* Porkbun ships a parking `ALIAS @ → pixie.porkbun.com` and a
+    `CNAME *` wildcard. An `A` record can't coexist with the root `ALIAS`, and inline
+    delete was flaky — replacing/overwriting the records (or "Delete All Records") was the
+    clean way through.
   - *Note:* the domain name (`brunopadel.app`) intentionally differs from the project
     name (`padeliq`) — a domain can front any project.
 
