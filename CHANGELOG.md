@@ -5,6 +5,26 @@ the change and the decision/reasoning behind it, so the history travels with the
 
 ---
 
+## 2026-07-31 — /clubs demo form → Supabase
+
+- Wired the pilot demo form to persist leads to **Supabase** (a new, dedicated project,
+  kept separate from Borapadel). On submit the form does `POST /rest/v1/club_leads` with the
+  project's **publishable/anon key**; adds a `Sending…` state, success → the thank-you,
+  failure → a visible error + retry.
+  - *Security model:* the table has RLS enabled with an **insert-only** policy for `anon` and
+    **no SELECT policy** — the public key (embedded in the page, by design) can add leads but
+    cannot read them back. Leads are read from the Supabase dashboard.
+  - *Verified end-to-end:* an empty-insert probe returned a NOT NULL `400` (table + key +
+    policy live, no row written); a valid insert returned `201`; the CORS preflight from
+    `brunopadel.app` returns `Allow-Origin: *`, so the browser fetch isn't blocked.
+  - *Decision:* couldn't create the project/table from here — the Supabase CLI is signed into
+    a different account than the project's org — so the user created the project and ran the
+    table SQL; this session verified and wired the client side.
+  - *Known tradeoff:* a public insert form can be spam-inserted with the visible key
+    (acceptable for a low-volume lead form; add a captcha/Turnstile later if abuse appears).
+
+---
+
 ## 2026-07-31 — /clubs demo form: extra qualifying fields
 
 - Added three fields to the pilot "Book a demo" form: **Location (city and country)**
