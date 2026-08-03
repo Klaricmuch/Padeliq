@@ -14,6 +14,9 @@ the change and the decision/reasoning behind it, so the history travels with the
   - *Gotcha:* a `disabled` placeholder `<option>` gets auto-skipped in Chromium (it selected
     "Yes"). Fixed with a plain `value="" selected` placeholder; `required` + empty value still
     blocks submit until a real choice is made.
+  - Dark-themed the dropdown: the native option list was rendering light-grey against the
+    dark page. Fixed with `color-scheme: dark` + dark `option` backgrounds; muted the
+    placeholder (`:required:invalid`) and added hover/focus polish.
   - Form remains front-end only (thank-you on submit); no backend yet.
 
 ---
