@@ -5,6 +5,21 @@ the change and the decision/reasoning behind it, so the history travels with the
 
 ---
 
+## 2026-07-31 — /clubs copy reframed around engagement/retention
+
+- Reframed the `/clubs` hero and the "what the club gets" section around a sharper pitch:
+  **you already have the camera → offer your players match analysis as your own service →
+  they stay engaged and keep booking with your center.** New H1 "The camera's already on
+  your court. Turn it into a reason players keep coming back."; hero sub now ends "AI Coach
+  Bruno does the reading; the service is yours." Club-value card 1 retitled to "A reason your
+  members keep booking with you."
+  - *Decision (confirmed with user):* stay **B2B / addressed to club owners** (not re-voiced
+    as a center-to-players B2C page), and **keep the AI Coach Bruno brand** (the club runs it
+    as their own white-labelled service). Structure and the rest of the sections unchanged —
+    they already fit this audience.
+
+---
+
 ## 2026-07-31 — /clubs rebuilt as a B2B page (AI Coach Bruno)
 
 - Rebuilt `/clubs` from the duplicated homepage into a **B2B landing page for padel club
