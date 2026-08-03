@@ -646,6 +646,7 @@
   .price-form .submit-row { grid-column: 1 / -1; margin-top: 4px; }
   .price-form .submit-row .btn { width: 100%; }
   .price-success { display: none; margin-top: 18px; font-size: 15px; font-weight: 600; color: var(--court-blue); }
+  .price-error { display: none; margin-top: 16px; font-size: 14px; color: #ff8a8a; }
   .price-form.done { display: none; }
   .price-form.done + .price-success { display: block; }
   @media (max-width: 560px) { .price-form { grid-template-columns: 1fr; } }
@@ -909,6 +910,7 @@
         </div>
       </form>
       <p class="price-success">✓ Thanks, we'll be in touch to schedule your demo.</p>
+      <p class="price-error" id="demoError">Something went wrong sending that. Please try again in a moment.</p>
     </div>
   </div>
 </section>
@@ -1655,7 +1657,10 @@ requestAnimationFrame(frame);
   });
 })();
 
-// front-end only: block submit until the custom dropdown is chosen, then show the thank-you
+// Save the lead to Supabase (public/anon key — RLS allows INSERT only), then show the thank-you
+var SUPABASE_URL = 'https://zytpltbpgpxkbpeayyxu.supabase.co';
+var SUPABASE_KEY = 'sb_publishable_ueRYo6zV5mHnbR3bWIfT-w_XNAUh8bJ';
+
 function bookDemo(e) {
   e.preventDefault();
   var form = e.target;
@@ -1666,7 +1671,43 @@ function bookDemo(e) {
     csel.scrollIntoView({ block: 'center', behavior: 'smooth' });
     return false;
   }
-  form.classList.add('done');
+
+  var btn = form.querySelector('button[type="submit"]');
+  var errEl = document.getElementById('demoError');
+  if (errEl) errEl.style.display = 'none';
+  var label = btn.textContent;
+  btn.disabled = true; btn.textContent = 'Sending…';
+
+  var val = function (sel) { var el = form.querySelector(sel); return el ? el.value.trim() : ''; };
+  var courts = parseInt(val('#pf-courts'), 10);
+  var payload = {
+    name: val('#pf-name'),
+    club: val('#pf-club'),
+    location: val('#pf-location'),
+    website: val('#pf-website') || null,
+    courts: isNaN(courts) ? null : courts,
+    email: val('#pf-email'),
+    has_camera: form.querySelector('.csel-input').value
+  };
+
+  fetch(SUPABASE_URL + '/rest/v1/club_leads', {
+    method: 'POST',
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_KEY,
+      'Content-Type': 'application/json',
+      'Prefer': 'return=minimal'
+    },
+    body: JSON.stringify(payload)
+  }).then(function (r) {
+    if (!r.ok) return r.text().then(function (t) { throw new Error(r.status + ' ' + t); });
+    form.classList.add('done');
+  }).catch(function (err) {
+    btn.disabled = false; btn.textContent = label;
+    if (errEl) errEl.style.display = 'block';
+    if (window.console) console.error('Lead submit failed:', err);
+  });
+
   return false;
 }
 </script>
