@@ -25,6 +25,22 @@ the change and the decision/reasoning behind it, so the history travels with the
 
 ---
 
+## 2026-07-31 — Slack notifications for new leads
+
+- New `club_leads` inserts now post to **Slack** (#form-submissions in padel-iq-workspace)
+  via a Postgres `AFTER INSERT` trigger that calls a Slack Incoming Webhook using **pg_net**
+  (`net.http_post`). Lives in Supabase (SQL), not in this repo.
+  - *Decision:* a DB trigger + pg_net rather than an Edge Function or a client-side call —
+    one SQL run, nothing to deploy, and the webhook URL stays **server-side in the DB
+    function**, never in the public page. Fire-and-forget, so a Slack outage can't block or
+    lose a lead.
+  - *Verified end-to-end:* a live API insert (`201`) produced the formatted Slack message in
+    #form-submissions.
+  - *Secret:* the Slack webhook URL exists only inside the DB function; it is **not** committed
+    to this repo.
+
+---
+
 ## 2026-07-31 — /clubs demo form → Supabase
 
 - Wired the pilot demo form to persist leads to **Supabase** (a new, dedicated project,
