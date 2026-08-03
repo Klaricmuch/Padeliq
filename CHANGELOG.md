@@ -5,6 +5,19 @@ the change and the decision/reasoning behind it, so the history travels with the
 
 ---
 
+## 2026-07-31 — /clubs demo form: extra qualifying fields
+
+- Added three fields to the pilot "Book a demo" form: **Location (city and country)**
+  (required), **Club website** (optional, `type=url`), and **Do you already have a court
+  camera?** (required select: Yes, on one or more courts / No, not yet / Not sure). The
+  camera question qualifies against the pilot's "we'll mount one if you don't" offer.
+  - *Gotcha:* a `disabled` placeholder `<option>` gets auto-skipped in Chromium (it selected
+    "Yes"). Fixed with a plain `value="" selected` placeholder; `required` + empty value still
+    blocks submit until a real choice is made.
+  - Form remains front-end only (thank-you on submit); no backend yet.
+
+---
+
 ## 2026-07-31 — /clubs copy reframed around engagement/retention
 
 - Reframed the `/clubs` hero and the "what the club gets" section around a sharper pitch:
