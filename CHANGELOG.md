@@ -5,6 +5,18 @@ the change and the decision/reasoning behind it, so the history travels with the
 
 ---
 
+## 2026-07-31 — Homepage rebrand: PadelIQ → AI Coach Bruno
+
+- Aligned the player homepage (`/`) to the **AI Coach Bruno** brand used on `/clubs` (it was
+  still the legacy placeholder "PadelIQ"). Updated the `<title>`, nav + footer logos, the hero
+  lede and the how-it-works copy; applied the naming convention (logo + first mention =
+  "AI Coach Bruno", plain "Bruno" after). Footer's old placeholder note replaced with a
+  "For clubs →" link to `/clubs` (mirrors the `/clubs` footer linking back to `/`).
+  - *Decision:* standardised on "AI Coach Bruno" (not "Bruno Padel") — it's the product brand
+    already live on `/clubs`. Only 2 non-visible HTML comments still say "PadelIQ".
+
+---
+
 ## 2026-07-31 — /clubs demo form → Supabase
 
 - Wired the pilot demo form to persist leads to **Supabase** (a new, dedicated project,
