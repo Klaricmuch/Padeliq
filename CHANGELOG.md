@@ -14,10 +14,15 @@ the change and the decision/reasoning behind it, so the history travels with the
   - *Gotcha:* a `disabled` placeholder `<option>` gets auto-skipped in Chromium (it selected
     "Yes"). Fixed with a plain `value="" selected` placeholder; `required` + empty value still
     blocks submit until a real choice is made.
-  - Dark-themed the dropdown: the native option list was rendering light-grey against the
-    dark page. Fixed with `color-scheme: dark` + dark `option` backgrounds; muted the
-    placeholder (`:required:invalid`) and added hover/focus polish.
-  - Form remains front-end only (thank-you on submit); no backend yet.
+  - **Dropdown styling:** first tried `color-scheme: dark` + dark `option` backgrounds — worked
+    in Chromium but **not Safari**, which draws its own translucent system menu for `<select>`
+    popups and ignores option styling. Replaced the native `<select>` with a **custom
+    accessible dropdown** (button + `role="listbox"` + hidden input): matches the dark theme in
+    every browser, supports keyboard + ARIA, closes on outside-click/Escape.
+  - Form remains front-end only. The custom dropdown can't use native `required`, so submit is
+    guarded by a small `bookDemo()` handler that blocks + highlights until a camera answer is
+    chosen (other fields still use native `required`). Thank-you shown on valid submit; no
+    backend yet.
 
 ---
 
