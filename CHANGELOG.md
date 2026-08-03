@@ -5,6 +5,14 @@ the change and the decision/reasoning behind it, so the history travels with the
 
 ---
 
+## 2026-07-31 — Homepage nav: fix dead "Accuracy" link
+
+- The homepage nav's "Accuracy" link pointed at `#trust`, a section removed back in the
+  initial build, so it scrolled nowhere. Repointed it to the existing `#faq` section and
+  relabelled it "FAQ". Homepage nav is now Metrics · How it works · FAQ.
+
+---
+
 ## 2026-07-31 — Homepage rebrand: PadelIQ → AI Coach Bruno
 
 - Aligned the player homepage (`/`) to the **AI Coach Bruno** brand used on `/clubs` (it was
