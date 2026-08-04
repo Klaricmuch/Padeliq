@@ -5,6 +5,20 @@ the change and the decision/reasoning behind it, so the history travels with the
 
 ---
 
+## 2026-08-04 — SEO: sitemap, robots.txt, Search Console
+
+- Added `sitemap.xml` (lists `/` and `/clubs`, canonical `www` URLs) and `robots.txt`
+  (allow-all + `Sitemap:` pointer). Both served at the domain root by Vercel; verified live
+  (`sitemap.xml` → 200 `application/xml`).
+- Verified the domain in **Google Search Console** via a DNS **TXT** record at Porkbun
+  (`google-site-verification=…`); confirmed it had propagated to Google's resolver before
+  verifying. The TXT record must stay in place permanently (removing it un-verifies the
+  property).
+  - *Decision:* DNS "Domain" property over an HTML meta-tag "URL-prefix" property — one
+    verification covers apex, `www`, and every subdomain / protocol.
+
+---
+
 ## 2026-07-31 — Homepage nav: fix dead "Accuracy" link
 
 - The homepage nav's "Accuracy" link pointed at `#trust`, a section removed back in the
