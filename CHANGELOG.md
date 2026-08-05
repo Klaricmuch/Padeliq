@@ -5,6 +5,21 @@ the change and the decision/reasoning behind it, so the history travels with the
 
 ---
 
+## 2026-08-05 — Favicon + Open Graph / Twitter cards
+
+- Added a tennis-ball **favicon** (`favicon.svg` + `favicon-32.png` + a dark-bg
+  `apple-touch-icon.png`) and per-page **Open Graph / Twitter Card** tags on both `/` and
+  `/clubs`, each with its own **1200×630** share image (`og-home.png` / `og-clubs.png`).
+  Images were rendered from small HTML templates via **headless Chrome** (no design tooling
+  installed), then sized with `sips`.
+  - *Decision:* raster **PNG** OG images, not SVG — Slack/Twitter/WhatsApp/Facebook don't
+    render SVG OG images. Page-specific cards so a shared `/clubs` link previews the
+    club-facing message, not the player homepage.
+  - All assets served from the repo root by Vercel; verified `200` + correct content-types,
+    and `og:`/`twitter:` tags present on both deployed pages.
+
+---
+
 ## 2026-08-04 — SEO: sitemap, robots.txt, Search Console
 
 - Added `sitemap.xml` (lists `/` and `/clubs`, canonical `www` URLs) and `robots.txt`
