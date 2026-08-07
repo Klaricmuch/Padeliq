@@ -5,6 +5,22 @@ the change and the decision/reasoning behind it, so the history travels with the
 
 ---
 
+## 2026-08-05 — Auth emails via Resend (custom SMTP)
+
+- Configured the new Supabase project's Auth emails to send via **Resend** custom SMTP (from
+  `login@brunopadel.app`), replacing Supabase's rate-limited built-in email. Verified the
+  domain in Resend (DKIM `resend._domainkey`, SPF + MX on `send`, DMARC — all added at Porkbun
+  and propagated), and set Supabase → Auth → SMTP to `smtp.resend.com:465` (user `resend`,
+  password = Resend API key).
+  - *Why:* the built-in sender is capped at a few emails/hour (we hit a `429`) and lands in
+    spam; Resend removes the limit and authenticates the domain (DKIM/SPF/DMARC).
+  - *Verified:* a magic-link request now returns `200` (was `429`) — the send goes through
+    Resend, from the brand domain. External config only; nothing in this repo.
+  - Also fixed the earlier `localhost:3000` redirect: set the project's Site URL to
+    `https://www.brunopadel.app` and allow-listed `…/admin` (+ `/**`) in Redirect URLs.
+
+---
+
 ## 2026-08-05 — Admin login → magic link (passwordless)
 
 - Switched `/admin` from email+password to **passwordless magic-link** login: enter an admin
