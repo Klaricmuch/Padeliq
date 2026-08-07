@@ -63,6 +63,13 @@
   .chip{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:var(--ink-2);
     background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:100px;padding:8px 14px}
   .chip:hover{color:#fff;border-color:rgba(255,106,61,.4);text-decoration:none}
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:26px}
+  @media(max-width:820px){.stats{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:460px){.stats{grid-template-columns:1fr}}
+  .stat{background:rgba(28,20,44,0.6);border:1px solid var(--border);border-radius:14px;padding:16px 18px}
+  .stat-k{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-faint)}
+  .stat-v{font-size:28px;font-weight:800;color:#fff;margin-top:8px;font-variant-numeric:tabular-nums;line-height:1.1}
+  .stat-sub{font-size:12px;color:var(--ink-soft);margin-top:5px}
   .toolbar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:16px}
   .toolbar h2{font-size:20px;font-weight:800}
   .toolbar h2 span{color:var(--ink-soft);font-weight:600;font-size:15px}
@@ -117,6 +124,13 @@
       <button class="btn ghost" id="logoutBtn" style="padding:8px 14px">Log out</button>
     </nav>
   </header>
+
+  <div class="stats">
+    <div class="stat"><div class="stat-k">Homepage visitors</div><div class="stat-v" id="stHomeV">—</div><div class="stat-sub" id="stHomeSub">last 30 days</div></div>
+    <div class="stat"><div class="stat-k">/clubs visitors</div><div class="stat-v" id="stClubsV">—</div><div class="stat-sub" id="stClubsSub">last 30 days</div></div>
+    <div class="stat"><div class="stat-k">/clubs form fills</div><div class="stat-v" id="stClubLeads">—</div><div class="stat-sub" id="stConv">demo requests</div></div>
+    <div class="stat"><div class="stat-k">Homepage signups</div><div class="stat-v" id="stSignups">—</div><div class="stat-sub">email waitlist</div></div>
+  </div>
 
   <div class="toolbar">
     <h2>Leads <span id="count"></span></h2>
@@ -246,8 +260,30 @@ function loadLeads(){
     if(!res) return;
     if(res.status === 401 || res.status === 403){ clearSession(); showLogin('Your session expired. Request a new sign-in link.'); return; }
     if(!res.ok){ setState('Could not load leads (HTTP ' + res.status + '). If this persists, the read policy may be missing for your email.'); return; }
-    return res.json().then(function(rows){ render(rows); });
+    return res.json().then(function(rows){ render(rows); refreshStats(rows.length); });
   }).catch(function(){ setState('Network error loading leads. Try Refresh.'); });
+}
+
+// --- stat cards ---
+function stNum(id, v){ var e=document.getElementById(id); if(e) e.textContent = (v===null||v===undefined) ? '—' : v; }
+function stSub(id, v){ var e=document.getElementById(id); if(e) e.textContent = v; }
+function refreshStats(leadsCount){
+  var s = getSession(); if(!s) return;
+  stNum('stClubLeads', leadsCount);
+  // homepage email signups count
+  fetch(SUPABASE_URL + '/rest/v1/email_signups?select=id', { headers: authHeaders(s.access_token) })
+    .then(function(r){ return r.ok ? r.json() : []; })
+    .then(function(rows){ stNum('stSignups', Array.isArray(rows) ? rows.length : '—'); })
+    .catch(function(){ stNum('stSignups', '—'); });
+  // visits from PostHog (serverless /api/stats)
+  fetch('/api/stats').then(function(r){ return r.json(); }).then(function(d){
+    if(!d || d.error){ stSub('stHomeSub','stats unavailable'); stSub('stClubsSub','stats unavailable'); return; }
+    var days = d.window_days || 30;
+    stNum('stHomeV', (d.home && d.home.visitors) || 0);   stSub('stHomeSub',  ((d.home && d.home.views) || 0)  + ' views · ' + days + 'd');
+    stNum('stClubsV', (d.clubs && d.clubs.visitors) || 0); stSub('stClubsSub', ((d.clubs && d.clubs.views) || 0) + ' views · ' + days + 'd');
+    var cv = (d.clubs && d.clubs.visitors) || 0;
+    if(cv > 0 && typeof leadsCount === 'number'){ stSub('stConv', (Math.round(leadsCount / cv * 1000) / 10) + '% of /clubs visitors'); }
+  }).catch(function(){ stSub('stHomeSub','stats unavailable'); stSub('stClubsSub','stats unavailable'); });
 }
 
 // --- events ---

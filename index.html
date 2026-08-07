@@ -877,17 +877,30 @@ const barIO = new IntersectionObserver((entries) => {
 const bars = document.getElementById('bars');
 if (bars) barIO.observe(bars);
 
-// forms — front-end only (no backend wired yet)
-function wireForm(formId) {
+// email signups -> Supabase (email_signups), best-effort; always show the thank-you
+var SUPABASE_URL = 'https://dybyhptwmzjadeysylbo.supabase.co';
+var SUPABASE_KEY = 'sb_publishable_TDhGCwyAGsgb0l4ntcmq0A_dmadouAk';
+function wireForm(formId, source) {
   const form = document.getElementById(formId);
   if (!form) return;
   form.addEventListener('submit', (ev) => {
     ev.preventDefault();
+    const input = form.querySelector('input[type="email"]');
+    const email = input ? input.value.trim() : '';
     form.classList.add('done');
+    if (!email) return;
+    fetch(SUPABASE_URL + '/rest/v1/email_signups', {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY,
+        'Content-Type': 'application/json', 'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify({ email: email, source: source })
+    }).catch(() => {});
   });
 }
-wireForm('heroForm');
-wireForm('ctaForm');
+wireForm('heroForm', 'home-hero');
+wireForm('ctaForm', 'home-cta');
 </script>
 
 <!-- demo payload (real ball track + base64 clip) injected below -->
