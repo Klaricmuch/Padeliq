@@ -35,6 +35,15 @@ the change and the decision/reasoning behind it, so the history travels with the
 
 ---
 
+## 2026-08-05 — Leads record their submission page
+
+- The `/clubs` form now records the submit URL (`source_url = window.location.href`), and the
+  admin leads table shows a **Page** column (the path, linked to the full URL). Added a
+  `source_url` column to `club_leads`. Deployed the form change only after the column existed,
+  so the live insert never broke. Verified: insert with `source_url` → 201; Page column live.
+
+---
+
 ## 2026-08-05 — Admin stats: 7d/30d toggle + funnel view
 
 - Restructured the admin stats into two **funnels** — Homepage (Visitors → Email signups) and
