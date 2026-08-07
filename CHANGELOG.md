@@ -5,6 +5,20 @@ the change and the decision/reasoning behind it, so the history travels with the
 
 ---
 
+## 2026-08-05 — Admin login → magic link (passwordless)
+
+- Switched `/admin` from email+password to **passwordless magic-link** login: enter an admin
+  email → Supabase emails a one-time sign-in link → clicking it returns to `/admin` with a
+  session (implicit flow — tokens parsed from the URL hash, then the URL is cleaned).
+  `create_user:false`, so only existing admin users get a link; the leads read stays gated by
+  the email-restricted RLS policy.
+  - *Requires (new project):* Site URL + a Redirect-URL allow-list entry for
+    `https://www.brunopadel.app/admin` (Auth → URL Configuration).
+  - *Verified:* page live; the OTP endpoint accepts the key (a throwaway email returns the
+    expected `otp_disabled`). The real-email sign-in is tested by the user.
+
+---
+
 ## 2026-08-05 — Switch Supabase project (new account)
 
 - Repointed the `/clubs` form and the `/admin` dashboard from the old Supabase project
