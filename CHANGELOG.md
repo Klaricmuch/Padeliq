@@ -35,6 +35,18 @@ the change and the decision/reasoning behind it, so the history travels with the
 
 ---
 
+## 2026-08-05 — Admin stats: 7d/30d toggle + funnel view
+
+- Restructured the admin stats into two **funnels** — Homepage (Visitors → Email signups) and
+  `/clubs` (Visitors → Demo requests), each with bars + a conversion % — plus a **7-day /
+  30-day** window toggle. `/api/stats` now returns both windows (`d7`/`d30`, via `countIf` /
+  `count(DISTINCT if(...))`); the form-fill and signup counts are windowed client-side from
+  `created_at`.
+  - *Verified:* `/api/stats` returns the `d7`/`d30` structure; the funnel markup + toggle are
+    live on `/admin`.
+
+---
+
 ## 2026-08-05 — Admin stats (visits + form fills)
 
 - Added a stats row to `/admin`: **Homepage visitors**, **/clubs visitors**, **/clubs form
