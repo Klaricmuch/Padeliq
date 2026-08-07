@@ -35,6 +35,24 @@ the change and the decision/reasoning behind it, so the history travels with the
 
 ---
 
+## 2026-08-05 — Admin stats (visits + form fills)
+
+- Added a stats row to `/admin`: **Homepage visitors**, **/clubs visitors**, **/clubs form
+  fills**, **Homepage signups**, plus a `/clubs` conversion %.
+  - **Visits** come from **PostHog** via a new Vercel serverless function `api/stats.js`
+    (HogQL `$pageview` query, last 30 days). The PostHog *personal* API key stays server-side
+    in Vercel env vars — never in the client. `/api/stats` returns `{home,clubs}` counts.
+  - **Homepage signups:** wired the homepage hero + CTA email forms to insert into a new
+    `email_signups` table (source-tagged, best-effort — always shows the thank-you). They were
+    front-end-only before.
+  - **/clubs form fills:** the existing `club_leads` count.
+  - *Pending config:* create `email_signups` (SQL, new project) + set `POSTHOG_API_KEY` /
+    `POSTHOG_PROJECT_ID` / `POSTHOG_HOST` in Vercel and redeploy. Cards degrade to "—" /
+    "stats unavailable" until then.
+  - *Verified:* `/api/stats` deploys and responds (`env vars not set` until configured).
+
+---
+
 ## 2026-08-05 — Switch Supabase project (new account)
 
 - Repointed the `/clubs` form and the `/admin` dashboard from the old Supabase project
