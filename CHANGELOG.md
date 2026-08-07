@@ -5,6 +5,19 @@ the change and the decision/reasoning behind it, so the history travels with the
 
 ---
 
+## 2026-08-05 — Switch Supabase project (new account)
+
+- Repointed the `/clubs` form and the `/admin` dashboard from the old Supabase project
+  (`zytpl…`) to a **new project on a different account** (`dybyhptwmzjadeysylbo`): updated
+  `SUPABASE_URL` + publishable key in both pages, and the admin's Supabase quick-link.
+  The table + insert RLS + Slack trigger + admin read policy were recreated on the new
+  project (SQL run by the user — I can't access it).
+  - Admin read policy allows **two admin emails** (the brand + owner accounts).
+  - *Verified:* deployed pages reference the new project; a real insert returned `201` and
+    fired the Slack trigger. The old project is now orphaned — no code references it.
+
+---
+
 ## 2026-08-05 — /admin hub (login + leads dashboard)
 
 - Added a private **`/admin`** page: a **Supabase-Auth** email/password login gating a **leads
