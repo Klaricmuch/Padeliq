@@ -46,10 +46,10 @@ the change and the decision/reasoning behind it, so the history travels with the
     `email_signups` table (source-tagged, best-effort — always shows the thank-you). They were
     front-end-only before.
   - **/clubs form fills:** the existing `club_leads` count.
-  - *Pending config:* create `email_signups` (SQL, new project) + set `POSTHOG_API_KEY` /
-    `POSTHOG_PROJECT_ID` / `POSTHOG_HOST` in Vercel and redeploy. Cards degrade to "—" /
-    "stats unavailable" until then.
-  - *Verified:* `/api/stats` deploys and responds (`env vars not set` until configured).
+  - *Configured & verified:* `email_signups` table created; Vercel env vars set (PostHog
+    project `242171`, EU host, `phx_` personal key); `/api/stats` returns live counts and a
+    test signup insert returned `201`. Cards degrade gracefully to "—"/"stats unavailable" if
+    the function ever errors.
 
 ---
 
