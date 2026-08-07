@@ -5,6 +5,23 @@ the change and the decision/reasoning behind it, so the history travels with the
 
 ---
 
+## 2026-08-05 — PostHog analytics + session replay
+
+- Added the PostHog **HTML snippet** to the `<head>` of both `/` and `/clubs` (EU cloud,
+  project `phc_v4A59…`, `person_profiles: identified_only`). Gives autocaptured pageviews +
+  clicks/interactions and session recording.
+  - *Decision:* the HTML snippet (manual) over PostHog's framework wizard / open-a-PR flow —
+    the site is static HTML (not a framework), and manual avoids connecting PostHog to GitHub
+    (the repo is under a different account than the PostHog login).
+  - *Verified:* the SDK loads and initializes in-browser on the live site (distinct_id +
+    session started, `capture()` ready); a direct event to the EU ingestion API returned
+    `{"status":"Ok"}`.
+  - *Pending on the PostHog side:* enable **Session Replay** in project settings (recordings
+    only capture once that toggle is on). EU cookie-consent is worth considering before
+    tracking (Portugal audience) — can add an opt-in banner if wanted.
+
+---
+
 ## 2026-08-05 — Favicon + Open Graph / Twitter cards
 
 - Added a tennis-ball **favicon** (`favicon.svg` + `favicon-32.png` + a dark-bg
