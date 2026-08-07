@@ -53,6 +53,12 @@ the change and the decision/reasoning behind it, so the history travels with the
   `created_at`.
   - *Verified:* `/api/stats` returns the `d7`/`d30` structure; the funnel markup + toggle are
     live on `/admin`.
+  - *Fix:* the demo/signup (`.alt`) bars used `var(--court-blue)`, which the admin CSS doesn't
+    define (it defines `--teal`). An undefined var inside `linear-gradient()` voids the whole
+    `background` (`background-image: none`), so the bar rendered **full-width but transparent** —
+    looked empty even at 100% conversion. Switched to `var(--teal)`. (Diagnosed via computed
+    styles: width was already `232px`/full; only the fill colour was missing — not a
+    width/timing/cache issue.)
 
 ---
 
