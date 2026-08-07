@@ -5,6 +5,23 @@ the change and the decision/reasoning behind it, so the history travels with the
 
 ---
 
+## 2026-08-05 — /admin hub (login + leads dashboard)
+
+- Added a private **`/admin`** page: a **Supabase-Auth** email/password login gating a **leads
+  dashboard** (reads `club_leads`, newest first) plus quick links to PostHog, Supabase and
+  Slack. Static HTML, plain `fetch` (no supabase-js), brand-themed; `noindex` + robots
+  `Disallow: /admin`. No PostHog on this page (don't track the admin).
+  - *Decision:* real Supabase Auth, not a client-side password — the page exposes personal
+    data (names/emails). Session token in localStorage with a refresh-token retry on 401.
+    Reads are gated by RLS, so the public key alone can't read leads without a valid admin JWT.
+  - *Verified:* page live (200); the EU auth endpoint accepts the publishable key (a dummy
+    login returns `invalid_credentials`, not a key error), so sign-in works once the admin
+    user + read policy exist.
+  - *Pending on the Supabase side (user):* create the admin user, disable public sign-ups, and
+    add an email-restricted SELECT policy on `club_leads`.
+
+---
+
 ## 2026-08-05 — PostHog analytics + session replay
 
 - Added the PostHog **HTML snippet** to the `<head>` of both `/` and `/clubs` (EU cloud,
