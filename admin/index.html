@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Admin · AI Coach Bruno</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<style>
+  :root{
+    --bg:#150826; --panel:rgba(28,20,44,0.72); --border:rgba(150,172,198,0.16);
+    --ink:#f6f7fb; --ink-2:#c3cedb; --ink-soft:#91a0b0; --ink-faint:#6b7a8c;
+    --accent:#ff3d81; --accent-2:#ff6a3d; --teal:#22e0d0; --green:#59d390;
+    --radius:16px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+    color:var(--ink);min-height:100vh;
+    background:
+      radial-gradient(1100px 600px at 82% -5%, rgba(214,60,255,0.14), transparent 60%),
+      radial-gradient(900px 520px at 8% 105%, rgba(255,106,61,0.12), transparent 60%),
+      var(--bg);}
+  a{color:var(--teal);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .ball{width:30px;height:30px;border-radius:50%;position:relative;overflow:hidden;flex:none;
+    background:radial-gradient(circle at 38% 32%, #e4fb6b 0%, #cfe94b 48%, #b6d613 100%);
+    box-shadow:inset 0 0 0 1.6px rgba(88,116,8,.65)}
+  .ball::before,.ball::after{content:"";position:absolute;width:150%;height:150%;border-radius:50%;border:2px solid #fbffe8;box-sizing:border-box}
+  .ball::before{left:-95%;top:-95%}.ball::after{right:-95%;bottom:-95%}
+  .brand{display:flex;align-items:center;gap:11px;font-weight:800;font-size:18px;letter-spacing:-.02em}
+  .brand b{color:var(--accent-2)}
+  .brand .tag{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint);
+    border:1px solid var(--border);border-radius:100px;padding:3px 9px;margin-left:4px}
+  .btn{font-family:inherit;font-weight:700;font-size:14px;border:none;border-radius:11px;padding:12px 18px;cursor:pointer;
+    color:#fff;background:linear-gradient(120deg,var(--accent),var(--accent-2))}
+  .btn:disabled{opacity:.6;cursor:default}
+  .btn.ghost{background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--ink)}
+
+  /* ---- login ---- */
+  #loginView{min-height:100vh;display:grid;place-items:center;padding:24px}
+  .card{width:100%;max-width:400px;background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);
+    padding:34px 30px;box-shadow:0 26px 74px rgba(0,0,0,.5);backdrop-filter:blur(10px)}
+  .card .brand{margin-bottom:24px}
+  .card h1{font-size:22px;margin-bottom:20px}
+  label{display:block;font-size:12px;font-weight:650;color:var(--ink-soft);margin:0 0 6px}
+  .field{margin-bottom:16px}
+  input{width:100%;padding:12px 14px;border-radius:11px;border:1px solid var(--border);color-scheme:dark;
+    background:rgba(24,14,36,.9);color:var(--ink);font-size:14.5px;font-family:inherit}
+  input:focus{outline:none;border-color:var(--accent-2);box-shadow:0 0 0 3px rgba(255,106,61,.16)}
+  .card .btn{width:100%;margin-top:6px}
+  .err{display:none;margin-top:14px;font-size:13.5px;color:#ff8a8a}
+  .err.show{display:block}
+  .muted{margin-top:18px;font-size:12px;color:var(--ink-faint);line-height:1.5}
+
+  /* ---- app ---- */
+  #appView{max-width:1180px;margin:0 auto;padding:22px 22px 60px}
+  header{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;
+    padding:16px 0 20px;border-bottom:1px solid var(--border);margin-bottom:24px}
+  header nav{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .chip{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:var(--ink-2);
+    background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:100px;padding:8px 14px}
+  .chip:hover{color:#fff;border-color:rgba(255,106,61,.4);text-decoration:none}
+  .toolbar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:16px}
+  .toolbar h2{font-size:20px;font-weight:800}
+  .toolbar h2 span{color:var(--ink-soft);font-weight:600;font-size:15px}
+  .tablewrap{overflow-x:auto;border:1px solid var(--border);border-radius:var(--radius);background:rgba(20,13,32,.5)}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;min-width:920px}
+  th{text-align:left;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-faint);
+    padding:14px 16px;border-bottom:1px solid var(--border);white-space:nowrap;position:sticky;top:0;background:#1a1030}
+  td{padding:13px 16px;border-bottom:1px solid var(--border-2,rgba(150,172,198,0.08));color:var(--ink-2);vertical-align:top}
+  tr:last-child td{border-bottom:none}
+  tbody tr:hover{background:rgba(255,255,255,.03)}
+  td.name{color:#fff;font-weight:650;white-space:nowrap}
+  td.date{color:var(--ink-soft);white-space:nowrap}
+  .cam{display:inline-block;font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:100px;white-space:nowrap}
+  .cam.yes{color:var(--green);background:rgba(89,211,144,.12)}
+  .cam.no{color:var(--accent-2);background:rgba(255,106,61,.12)}
+  .cam.maybe{color:var(--ink-soft);background:rgba(150,168,190,.12)}
+  .state{padding:60px 20px;text-align:center;color:var(--ink-soft)}
+  .spinner{width:26px;height:26px;border-radius:50%;border:3px solid rgba(255,255,255,.15);border-top-color:var(--accent-2);
+    margin:0 auto 14px;animation:spin .8s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  [hidden]{display:none!important}
+</style>
+</head>
+<body>
+
+<!-- ===================== LOGIN ===================== -->
+<div id="loginView" hidden>
+  <form class="card" id="loginForm">
+    <div class="brand"><span class="ball"></span>AI Coach <b>Bruno</b><span class="tag">Admin</span></div>
+    <h1>Sign in</h1>
+    <div class="field">
+      <label for="email">Email</label>
+      <input id="email" type="email" autocomplete="username" required>
+    </div>
+    <div class="field">
+      <label for="password">Password</label>
+      <input id="password" type="password" autocomplete="current-password" required>
+    </div>
+    <button class="btn" type="submit" id="loginBtn">Sign in</button>
+    <p class="err" id="loginError"></p>
+    <p class="muted">Private area. Access is restricted to authorised accounts.</p>
+  </form>
+</div>
+
+<!-- ===================== APP ===================== -->
+<div id="appView" hidden>
+  <header>
+    <div class="brand"><span class="ball"></span>AI Coach <b>Bruno</b><span class="tag">Admin</span></div>
+    <nav>
+      <a class="chip" href="https://eu.posthog.com" target="_blank" rel="noopener">📈 PostHog</a>
+      <a class="chip" href="https://supabase.com/dashboard/project/zytpltbpgpxkbpeayyxu/editor" target="_blank" rel="noopener">🗄️ Supabase</a>
+      <a class="chip" href="https://padel-iq-workspace.slack.com" target="_blank" rel="noopener">💬 Slack</a>
+      <a class="chip" href="/clubs" target="_blank" rel="noopener">🌐 /clubs</a>
+      <button class="btn ghost" id="logoutBtn" style="padding:8px 14px">Log out</button>
+    </nav>
+  </header>
+
+  <div class="toolbar">
+    <h2>Leads <span id="count"></span></h2>
+    <button class="btn ghost" id="refreshBtn" style="padding:9px 15px">Refresh</button>
+  </div>
+
+  <div class="tablewrap">
+    <table>
+      <thead><tr>
+        <th>Date</th><th>Name</th><th>Club</th><th>Location</th><th>Courts</th><th>Email</th><th>Camera</th><th>Website</th>
+      </tr></thead>
+      <tbody id="leadsBody"></tbody>
+    </table>
+  </div>
+  <div id="stateMsg" class="state" hidden></div>
+</div>
+
+<script>
+"use strict";
+var SUPABASE_URL = 'https://zytpltbpgpxkbpeayyxu.supabase.co';
+var SUPABASE_KEY = 'sb_publishable_ueRYo6zV5mHnbR3bWIfT-w_XNAUh8bJ';
+var STORE = 'brunopadel_admin_session';
+
+var loginView = document.getElementById('loginView');
+var appView   = document.getElementById('appView');
+var loginForm = document.getElementById('loginForm');
+var loginBtn  = document.getElementById('loginBtn');
+var loginError= document.getElementById('loginError');
+var leadsBody = document.getElementById('leadsBody');
+var stateMsg  = document.getElementById('stateMsg');
+var countEl   = document.getElementById('count');
+
+function getSession(){ try { return JSON.parse(localStorage.getItem(STORE)); } catch(e){ return null; } }
+function setSession(s){ localStorage.setItem(STORE, JSON.stringify(s)); }
+function clearSession(){ localStorage.removeItem(STORE); }
+
+function showLogin(msg){
+  appView.hidden = true; loginView.hidden = false;
+  if (msg){ loginError.textContent = msg; loginError.classList.add('show'); }
+}
+function showApp(){ loginView.hidden = true; appView.hidden = false; }
+
+function authHeaders(token){
+  return { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + token };
+}
+
+// --- auth ---
+function signIn(email, password){
+  return fetch(SUPABASE_URL + '/auth/v1/token?grant_type=password', {
+    method:'POST',
+    headers:{ 'apikey': SUPABASE_KEY, 'Content-Type':'application/json' },
+    body: JSON.stringify({ email: email, password: password })
+  }).then(function(r){ return r.json().then(function(j){ return { ok:r.ok, body:j }; }); });
+}
+function refreshToken(rt){
+  return fetch(SUPABASE_URL + '/auth/v1/token?grant_type=refresh_token', {
+    method:'POST',
+    headers:{ 'apikey': SUPABASE_KEY, 'Content-Type':'application/json' },
+    body: JSON.stringify({ refresh_token: rt })
+  }).then(function(r){ return r.ok ? r.json() : null; });
+}
+
+// --- leads ---
+function getLeads(token){
+  return fetch(SUPABASE_URL + '/rest/v1/club_leads?select=*&order=created_at.desc', {
+    headers: authHeaders(token)
+  });
+}
+
+function setState(html){ if(html){ stateMsg.innerHTML = html; stateMsg.hidden = false; } else { stateMsg.hidden = true; } }
+
+function camClass(v){ v=(v||'').toLowerCase(); if(v.indexOf('yes')===0) return 'yes'; if(v.indexOf('no')===0) return 'no'; return 'maybe'; }
+
+function fmtDate(s){ if(!s) return '—'; var d=new Date(s); if(isNaN(d)) return s;
+  return d.toLocaleString(undefined,{year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}); }
+
+function cell(text, cls){ var td=document.createElement('td'); if(cls) td.className=cls;
+  td.textContent = (text===null||text===undefined||text==='') ? '—' : String(text); return td; }
+function linkCell(value, href){ var td=document.createElement('td');
+  if(!value){ td.textContent='—'; return td; }
+  var a=document.createElement('a'); a.href=href; a.textContent=value; a.target='_blank'; a.rel='noopener'; td.appendChild(a); return td; }
+
+function render(rows){
+  leadsBody.innerHTML='';
+  countEl.textContent = rows.length ? '· ' + rows.length : '';
+  if(!rows.length){ setState('No leads yet. Submissions from the /clubs form will appear here.'); return; }
+  setState(null);
+  rows.forEach(function(r){
+    var tr=document.createElement('tr');
+    tr.appendChild(cell(fmtDate(r.created_at),'date'));
+    tr.appendChild(cell(r.name,'name'));
+    tr.appendChild(cell(r.club));
+    tr.appendChild(cell(r.location));
+    tr.appendChild(cell(r.courts));
+    tr.appendChild(linkCell(r.email, 'mailto:' + r.email));
+    var camTd=document.createElement('td');
+    if(r.has_camera){ var s=document.createElement('span'); s.className='cam '+camClass(r.has_camera); s.textContent=r.has_camera; camTd.appendChild(s); } else camTd.textContent='—';
+    tr.appendChild(camTd);
+    tr.appendChild(linkCell(r.website, r.website));
+    leadsBody.appendChild(tr);
+  });
+}
+
+function loadLeads(){
+  var s = getSession();
+  if(!s || !s.access_token){ showLogin(); return; }
+  setState('<div class="spinner"></div>Loading leads…');
+  getLeads(s.access_token).then(function(res){
+    if(res.status === 401){
+      // try a token refresh, then retry once
+      return refreshToken(s.refresh_token).then(function(nt){
+        if(!nt || !nt.access_token){ clearSession(); showLogin('Your session expired. Please sign in again.'); return null; }
+        setSession(nt);
+        return getLeads(nt.access_token);
+      });
+    }
+    return res;
+  }).then(function(res){
+    if(!res) return;
+    if(res.status === 401 || res.status === 403){ clearSession(); showLogin('Your session expired. Please sign in again.'); return; }
+    if(!res.ok){ setState('Could not load leads (HTTP ' + res.status + '). If this persists, the read policy may be missing.'); return; }
+    return res.json().then(function(rows){ showApp(); render(rows); });
+  }).catch(function(){ setState('Network error loading leads. Try Refresh.'); });
+}
+
+// --- events ---
+loginForm.addEventListener('submit', function(e){
+  e.preventDefault();
+  loginError.classList.remove('show');
+  var email = document.getElementById('email').value.trim();
+  var password = document.getElementById('password').value;
+  loginBtn.disabled = true; loginBtn.textContent = 'Signing in…';
+  signIn(email, password).then(function(r){
+    loginBtn.disabled = false; loginBtn.textContent = 'Sign in';
+    if(!r.ok){
+      var msg = (r.body && (r.body.error_description || r.body.msg || r.body.error)) || 'Invalid email or password.';
+      loginError.textContent = msg; loginError.classList.add('show'); return;
+    }
+    setSession(r.body);
+    loadLeads();
+  }).catch(function(){
+    loginBtn.disabled = false; loginBtn.textContent = 'Sign in';
+    loginError.textContent = 'Network error. Please try again.'; loginError.classList.add('show');
+  });
+});
+
+document.getElementById('logoutBtn').addEventListener('click', function(){ clearSession(); showLogin(); });
+document.getElementById('refreshBtn').addEventListener('click', loadLeads);
+
+// on load: resume session if present, else show login
+if(getSession()){ loadLeads(); } else { showLogin(); }
+</script>
+</body>
+</html>
