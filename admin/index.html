@@ -160,7 +160,7 @@
   <div class="tablewrap">
     <table>
       <thead><tr>
-        <th>Date</th><th>Name</th><th>Club</th><th>Location</th><th>Courts</th><th>Email</th><th>Camera</th><th>Website</th>
+        <th>Date</th><th>Name</th><th>Club</th><th>Location</th><th>Courts</th><th>Email</th><th>Camera</th><th>Website</th><th>Page</th>
       </tr></thead>
       <tbody id="leadsBody"></tbody>
     </table>
@@ -260,6 +260,15 @@ function render(rows){
     if(r.has_camera){ var s=document.createElement('span'); s.className='cam '+camClass(r.has_camera); s.textContent=r.has_camera; camTd.appendChild(s); } else camTd.textContent='—';
     tr.appendChild(camTd);
     tr.appendChild(linkCell(r.website, r.website));
+    // page / source url (show the path, link to the full url)
+    var pageTd = document.createElement('td');
+    if (r.source_url) {
+      var pageText = r.source_url;
+      try { var pu = new URL(r.source_url); pageText = pu.pathname + (pu.search || ''); } catch(e){}
+      var pa = document.createElement('a'); pa.href = r.source_url; pa.textContent = pageText; pa.target = '_blank'; pa.rel = 'noopener';
+      pageTd.appendChild(pa);
+    } else { pageTd.textContent = '—'; }
+    tr.appendChild(pageTd);
     leadsBody.appendChild(tr);
   });
 }

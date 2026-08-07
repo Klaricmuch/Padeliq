@@ -1711,7 +1711,8 @@ function bookDemo(e) {
     website: val('#pf-website') || null,
     courts: isNaN(courts) ? null : courts,
     email: val('#pf-email'),
-    has_camera: form.querySelector('.csel-input').value
+    has_camera: form.querySelector('.csel-input').value,
+    source_url: window.location.href
   };
 
   fetch(SUPABASE_URL + '/rest/v1/club_leads', {
