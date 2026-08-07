@@ -1,13 +1,13 @@
-// Vercel serverless function: returns visit counts for / and /clubs from PostHog.
-// Env vars (set in Vercel → Project → Settings → Environment Variables):
-//   POSTHOG_API_KEY     — a PostHog *personal* API key with query read scope (secret; server-side only)
-//   POSTHOG_PROJECT_ID  — the numeric project id
-//   POSTHOG_HOST        — e.g. https://eu.posthog.com  (optional; defaults to EU)
+// Vercel serverless function: returns visit counts for / and /clubs from PostHog,
+// for two windows (last 7 days and last 30 days).
+// Env vars (Vercel → Project → Settings → Environment Variables):
+//   POSTHOG_API_KEY     — a PostHog *personal* API key (phx_…) with query read scope (secret)
+//   POSTHOG_PROJECT_ID  — the numeric project id (e.g. 242171)
+//   POSTHOG_HOST        — e.g. https://eu.posthog.com (optional; defaults to EU)
 module.exports = async (req, res) => {
   const KEY = process.env.POSTHOG_API_KEY;
   const PROJECT = process.env.POSTHOG_PROJECT_ID;
   const HOST = (process.env.POSTHOG_HOST || 'https://eu.posthog.com').replace(/\/$/, '');
-  const DAYS = 30;
 
   if (!KEY || !PROJECT) {
     res.status(500).json({ error: 'PostHog env vars not set (POSTHOG_API_KEY / POSTHOG_PROJECT_ID).' });
@@ -15,10 +15,14 @@ module.exports = async (req, res) => {
   }
 
   const hogql =
-    "SELECT properties.$pathname AS path, count() AS views, count(DISTINCT person_id) AS visitors " +
+    "SELECT properties.$pathname AS path, " +
+    "countIf(timestamp > now() - INTERVAL 7 DAY) AS v7, " +
+    "count(DISTINCT if(timestamp > now() - INTERVAL 7 DAY, person_id, NULL)) AS u7, " +
+    "count() AS v30, " +
+    "count(DISTINCT person_id) AS u30 " +
     "FROM events " +
     "WHERE event = '$pageview' " +
-    "AND timestamp > now() - INTERVAL " + DAYS + " DAY " +
+    "AND timestamp > now() - INTERVAL 30 DAY " +
     "AND properties.$pathname IN ('/', '/clubs') " +
     "GROUP BY path";
 
@@ -34,11 +38,16 @@ module.exports = async (req, res) => {
       return;
     }
     const data = await r.json();
-    const out = { home: { views: 0, visitors: 0 }, clubs: { views: 0, visitors: 0 }, window_days: DAYS };
+    const out = {
+      d7:  { home: { views: 0, visitors: 0 }, clubs: { views: 0, visitors: 0 } },
+      d30: { home: { views: 0, visitors: 0 }, clubs: { views: 0, visitors: 0 } }
+    };
     (data.results || []).forEach((row) => {
-      const path = row[0], views = Number(row[1]) || 0, visitors = Number(row[2]) || 0;
-      if (path === '/') out.home = { views, visitors };
-      else if (path === '/clubs') out.clubs = { views, visitors };
+      const path = row[0];
+      const key = path === '/' ? 'home' : path === '/clubs' ? 'clubs' : null;
+      if (!key) return;
+      out.d7[key]  = { views: Number(row[1]) || 0, visitors: Number(row[2]) || 0 };
+      out.d30[key] = { views: Number(row[3]) || 0, visitors: Number(row[4]) || 0 };
     });
     res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=600');
     res.status(200).json(out);

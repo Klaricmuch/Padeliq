@@ -63,13 +63,21 @@
   .chip{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:var(--ink-2);
     background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:100px;padding:8px 14px}
   .chip:hover{color:#fff;border-color:rgba(255,106,61,.4);text-decoration:none}
-  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:26px}
-  @media(max-width:820px){.stats{grid-template-columns:repeat(2,1fr)}}
-  @media(max-width:460px){.stats{grid-template-columns:1fr}}
-  .stat{background:rgba(28,20,44,0.6);border:1px solid var(--border);border-radius:14px;padding:16px 18px}
-  .stat-k{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-faint)}
-  .stat-v{font-size:28px;font-weight:800;color:#fff;margin-top:8px;font-variant-numeric:tabular-nums;line-height:1.1}
-  .stat-sub{font-size:12px;color:var(--ink-soft);margin-top:5px}
+  .win-toggle{display:inline-flex;gap:4px;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:100px;padding:4px;margin-bottom:20px}
+  .wbtn{font-family:inherit;font-size:13px;font-weight:650;color:var(--ink-soft);background:none;border:none;border-radius:100px;padding:7px 16px;cursor:pointer}
+  .wbtn.active{background:linear-gradient(120deg,var(--accent),var(--accent-2));color:#fff}
+  .funnels{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:28px}
+  @media(max-width:820px){.funnels{grid-template-columns:1fr}}
+  .funnel{background:rgba(28,20,44,0.6);border:1px solid var(--border);border-radius:16px;padding:20px 22px}
+  .funnel-title{font-size:14px;font-weight:800;margin-bottom:16px}
+  .frow{display:grid;grid-template-columns:118px 1fr auto;align-items:center;gap:12px;margin-bottom:10px}
+  .fbar-label{font-size:12.5px;color:var(--ink-soft)}
+  .fbar-track{height:26px;background:rgba(150,172,198,.1);border-radius:7px;overflow:hidden}
+  .fbar-fill{height:100%;border-radius:7px;background:linear-gradient(90deg,var(--accent),var(--accent-2));width:0;transition:width .45s ease;min-width:3px}
+  .fbar-fill.alt{background:linear-gradient(90deg,var(--court-blue),#3f9fc0)}
+  .fbar-num{font-size:16px;font-weight:800;color:#fff;font-variant-numeric:tabular-nums;min-width:34px;text-align:right}
+  .fconv{margin-top:12px;font-size:13px;color:var(--ink-soft)}
+  .fconv b{color:#fff;font-size:15px}
   .toolbar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:16px}
   .toolbar h2{font-size:20px;font-weight:800}
   .toolbar h2 span{color:var(--ink-soft);font-weight:600;font-size:15px}
@@ -125,11 +133,23 @@
     </nav>
   </header>
 
-  <div class="stats">
-    <div class="stat"><div class="stat-k">Homepage visitors</div><div class="stat-v" id="stHomeV">—</div><div class="stat-sub" id="stHomeSub">last 30 days</div></div>
-    <div class="stat"><div class="stat-k">/clubs visitors</div><div class="stat-v" id="stClubsV">—</div><div class="stat-sub" id="stClubsSub">last 30 days</div></div>
-    <div class="stat"><div class="stat-k">/clubs form fills</div><div class="stat-v" id="stClubLeads">—</div><div class="stat-sub" id="stConv">demo requests</div></div>
-    <div class="stat"><div class="stat-k">Homepage signups</div><div class="stat-v" id="stSignups">—</div><div class="stat-sub">email waitlist</div></div>
+  <div class="win-toggle" id="winToggle">
+    <button class="wbtn active" data-win="7" type="button">Last 7 days</button>
+    <button class="wbtn" data-win="30" type="button">Last 30 days</button>
+  </div>
+  <div class="funnels">
+    <div class="funnel">
+      <div class="funnel-title">Homepage</div>
+      <div class="frow"><div class="fbar-label">Visitors</div><div class="fbar-track"><div class="fbar-fill" id="fnHomeVBar"></div></div><div class="fbar-num" id="fnHomeV">—</div></div>
+      <div class="frow"><div class="fbar-label">Email signups</div><div class="fbar-track"><div class="fbar-fill alt" id="fnHomeSBar"></div></div><div class="fbar-num" id="fnHomeS">—</div></div>
+      <div class="fconv">Conversion <b id="fnHomeConv">—</b></div>
+    </div>
+    <div class="funnel">
+      <div class="funnel-title">/clubs</div>
+      <div class="frow"><div class="fbar-label">Visitors</div><div class="fbar-track"><div class="fbar-fill" id="fnClubsVBar"></div></div><div class="fbar-num" id="fnClubsV">—</div></div>
+      <div class="frow"><div class="fbar-label">Demo requests</div><div class="fbar-track"><div class="fbar-fill alt" id="fnClubsSBar"></div></div><div class="fbar-num" id="fnClubsS">—</div></div>
+      <div class="fconv">Conversion <b id="fnClubsConv">—</b></div>
+    </div>
   </div>
 
   <div class="toolbar">
@@ -260,31 +280,57 @@ function loadLeads(){
     if(!res) return;
     if(res.status === 401 || res.status === 403){ clearSession(); showLogin('Your session expired. Request a new sign-in link.'); return; }
     if(!res.ok){ setState('Could not load leads (HTTP ' + res.status + '). If this persists, the read policy may be missing for your email.'); return; }
-    return res.json().then(function(rows){ render(rows); refreshStats(rows.length); });
+    return res.json().then(function(rows){ render(rows); refreshStats(rows); });
   }).catch(function(){ setState('Network error loading leads. Try Refresh.'); });
 }
 
-// --- stat cards ---
-function stNum(id, v){ var e=document.getElementById(id); if(e) e.textContent = (v===null||v===undefined) ? '—' : v; }
-function stSub(id, v){ var e=document.getElementById(id); if(e) e.textContent = v; }
-function refreshStats(leadsCount){
-  var s = getSession(); if(!s) return;
-  stNum('stClubLeads', leadsCount);
-  // homepage email signups count
-  fetch(SUPABASE_URL + '/rest/v1/email_signups?select=id', { headers: authHeaders(s.access_token) })
-    .then(function(r){ return r.ok ? r.json() : []; })
-    .then(function(rows){ stNum('stSignups', Array.isArray(rows) ? rows.length : '—'); })
-    .catch(function(){ stNum('stSignups', '—'); });
-  // visits from PostHog (serverless /api/stats)
-  fetch('/api/stats').then(function(r){ return r.json(); }).then(function(d){
-    if(!d || d.error){ stSub('stHomeSub','stats unavailable'); stSub('stClubsSub','stats unavailable'); return; }
-    var days = d.window_days || 30;
-    stNum('stHomeV', (d.home && d.home.visitors) || 0);   stSub('stHomeSub',  ((d.home && d.home.views) || 0)  + ' views · ' + days + 'd');
-    stNum('stClubsV', (d.clubs && d.clubs.visitors) || 0); stSub('stClubsSub', ((d.clubs && d.clubs.views) || 0) + ' views · ' + days + 'd');
-    var cv = (d.clubs && d.clubs.visitors) || 0;
-    if(cv > 0 && typeof leadsCount === 'number'){ stSub('stConv', (Math.round(leadsCount / cv * 1000) / 10) + '% of /clubs visitors'); }
-  }).catch(function(){ stSub('stHomeSub','stats unavailable'); stSub('stClubsSub','stats unavailable'); });
+// --- stats funnels (7d / 30d) ---
+var STATS = { visits: null, leads: [], signups: null };
+var curWin = 7;
+
+function countWithin(rows, days){
+  if(!Array.isArray(rows)) return 0;
+  var cutoff = Date.now() - days * 86400000;
+  return rows.filter(function(r){ var t = Date.parse(r.created_at); return !isNaN(t) && t >= cutoff; }).length;
 }
+function setTxt(id, v){ var e=document.getElementById(id); if(e) e.textContent = v; }
+function setBar(id, pct){ var e=document.getElementById(id); if(e) e.style.width = Math.max(0, Math.min(100, pct)) + '%'; }
+
+function funnelStep(visitors, fills, ids){
+  var haveV = (visitors !== null && visitors !== undefined);
+  setTxt(ids.v, haveV ? visitors : '—');
+  setTxt(ids.s, (STATS.signups === null && ids.isSignup) ? '—' : fills);
+  setBar(ids.vBar, haveV && visitors > 0 ? 100 : (haveV ? 0 : 0));
+  setBar(ids.sBar, (haveV && visitors > 0) ? (fills / visitors * 100) : 0);
+  setTxt(ids.conv, (haveV && visitors > 0) ? (Math.round(fills / visitors * 1000) / 10) + '%' : '—');
+}
+function renderFunnels(){
+  var v = STATS.visits ? STATS.visits['d' + curWin] : null;
+  funnelStep(v ? v.home.visitors : null, countWithin(STATS.signups, curWin),
+    { v:'fnHomeV', s:'fnHomeS', vBar:'fnHomeVBar', sBar:'fnHomeSBar', conv:'fnHomeConv', isSignup:true });
+  funnelStep(v ? v.clubs.visitors : null, countWithin(STATS.leads, curWin),
+    { v:'fnClubsV', s:'fnClubsS', vBar:'fnClubsVBar', sBar:'fnClubsSBar', conv:'fnClubsConv', isSignup:false });
+}
+
+function refreshStats(leadRows){
+  var s = getSession(); if(!s) return;
+  STATS.leads = leadRows || [];
+  renderFunnels();
+  fetch(SUPABASE_URL + '/rest/v1/email_signups?select=created_at', { headers: authHeaders(s.access_token) })
+    .then(function(r){ return r.ok ? r.json() : []; })
+    .then(function(rows){ STATS.signups = Array.isArray(rows) ? rows : []; renderFunnels(); })
+    .catch(function(){ STATS.signups = []; renderFunnels(); });
+  fetch('/api/stats').then(function(r){ return r.json(); }).then(function(d){
+    STATS.visits = (d && !d.error) ? d : null; renderFunnels();
+  }).catch(function(){ STATS.visits = null; renderFunnels(); });
+}
+
+document.getElementById('winToggle').addEventListener('click', function(e){
+  var b = e.target.closest('.wbtn'); if(!b) return;
+  curWin = parseInt(b.getAttribute('data-win'), 10);
+  Array.prototype.forEach.call(this.querySelectorAll('.wbtn'), function(x){ x.classList.toggle('active', x === b); });
+  renderFunnels();
+});
 
 // --- events ---
 loginForm.addEventListener('submit', function(e){
