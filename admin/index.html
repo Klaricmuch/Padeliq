@@ -41,15 +41,18 @@
   .card{width:100%;max-width:400px;background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);
     padding:34px 30px;box-shadow:0 26px 74px rgba(0,0,0,.5);backdrop-filter:blur(10px)}
   .card .brand{margin-bottom:24px}
-  .card h1{font-size:22px;margin-bottom:20px}
+  .card h1{font-size:22px;margin-bottom:10px}
+  .lead{font-size:13.5px;color:var(--ink-2);margin:0 0 18px;line-height:1.55}
   label{display:block;font-size:12px;font-weight:650;color:var(--ink-soft);margin:0 0 6px}
   .field{margin-bottom:16px}
   input{width:100%;padding:12px 14px;border-radius:11px;border:1px solid var(--border);color-scheme:dark;
     background:rgba(24,14,36,.9);color:var(--ink);font-size:14.5px;font-family:inherit}
   input:focus{outline:none;border-color:var(--accent-2);box-shadow:0 0 0 3px rgba(255,106,61,.16)}
   .card .btn{width:100%;margin-top:6px}
-  .err{display:none;margin-top:14px;font-size:13.5px;color:#ff8a8a}
+  .err{display:none;margin-top:14px;font-size:13.5px;color:#ff8a8a;line-height:1.5}
   .err.show{display:block}
+  .ok{display:none;margin-top:16px;font-size:13.5px;color:var(--green);line-height:1.55}
+  .ok.show{display:block}
   .muted{margin-top:18px;font-size:12px;color:var(--ink-faint);line-height:1.5}
 
   /* ---- app ---- */
@@ -67,7 +70,7 @@
   table{width:100%;border-collapse:collapse;font-size:13.5px;min-width:920px}
   th{text-align:left;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-faint);
     padding:14px 16px;border-bottom:1px solid var(--border);white-space:nowrap;position:sticky;top:0;background:#1a1030}
-  td{padding:13px 16px;border-bottom:1px solid var(--border-2,rgba(150,172,198,0.08));color:var(--ink-2);vertical-align:top}
+  td{padding:13px 16px;border-bottom:1px solid rgba(150,172,198,0.08);color:var(--ink-2);vertical-align:top}
   tr:last-child td{border-bottom:none}
   tbody tr:hover{background:rgba(255,255,255,.03)}
   td.name{color:#fff;font-weight:650;white-space:nowrap}
@@ -85,22 +88,20 @@
 </head>
 <body>
 
-<!-- ===================== LOGIN ===================== -->
+<!-- ===================== LOGIN (magic link) ===================== -->
 <div id="loginView" hidden>
   <form class="card" id="loginForm">
     <div class="brand"><span class="ball"></span>AI Coach <b>Bruno</b><span class="tag">Admin</span></div>
     <h1>Sign in</h1>
+    <p class="lead">Enter your admin email and we'll send you a one-time sign-in link. No password needed.</p>
     <div class="field">
       <label for="email">Email</label>
-      <input id="email" type="email" autocomplete="username" required>
+      <input id="email" type="email" autocomplete="email" required>
     </div>
-    <div class="field">
-      <label for="password">Password</label>
-      <input id="password" type="password" autocomplete="current-password" required>
-    </div>
-    <button class="btn" type="submit" id="loginBtn">Sign in</button>
+    <button class="btn" type="submit" id="loginBtn">Email me a login link</button>
     <p class="err" id="loginError"></p>
-    <p class="muted">Private area. Access is restricted to authorised accounts.</p>
+    <p class="ok" id="loginSent">✓ Check your inbox — we sent a sign-in link to <b id="sentTo"></b>. Open it on this device (check spam too).</p>
+    <p class="muted">Private area. Only authorised admin emails receive a link.</p>
   </form>
 </div>
 
@@ -137,6 +138,7 @@
 "use strict";
 var SUPABASE_URL = 'https://dybyhptwmzjadeysylbo.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_TDhGCwyAGsgb0l4ntcmq0A_dmadouAk';
+var ADMIN_REDIRECT = 'https://www.brunopadel.app/admin';
 var STORE = 'brunopadel_admin_session';
 
 var loginView = document.getElementById('loginView');
@@ -144,6 +146,7 @@ var appView   = document.getElementById('appView');
 var loginForm = document.getElementById('loginForm');
 var loginBtn  = document.getElementById('loginBtn');
 var loginError= document.getElementById('loginError');
+var loginSent = document.getElementById('loginSent');
 var leadsBody = document.getElementById('leadsBody');
 var stateMsg  = document.getElementById('stateMsg');
 var countEl   = document.getElementById('count');
@@ -154,44 +157,52 @@ function clearSession(){ localStorage.removeItem(STORE); }
 
 function showLogin(msg){
   appView.hidden = true; loginView.hidden = false;
+  loginSent.classList.remove('show');
   if (msg){ loginError.textContent = msg; loginError.classList.add('show'); }
+  else loginError.classList.remove('show');
 }
 function showApp(){ loginView.hidden = true; appView.hidden = false; }
+function authHeaders(token){ return { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + token }; }
 
-function authHeaders(token){
-  return { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + token };
-}
-
-// --- auth ---
-function signIn(email, password){
-  return fetch(SUPABASE_URL + '/auth/v1/token?grant_type=password', {
+// --- magic link ---
+function sendMagicLink(email){
+  return fetch(SUPABASE_URL + '/auth/v1/otp?redirect_to=' + encodeURIComponent(ADMIN_REDIRECT), {
     method:'POST',
     headers:{ 'apikey': SUPABASE_KEY, 'Content-Type':'application/json' },
-    body: JSON.stringify({ email: email, password: password })
-  }).then(function(r){ return r.json().then(function(j){ return { ok:r.ok, body:j }; }); });
+    body: JSON.stringify({ email: email, create_user: false })
+  });
 }
 function refreshToken(rt){
+  if(!rt) return Promise.resolve(null);
   return fetch(SUPABASE_URL + '/auth/v1/token?grant_type=refresh_token', {
     method:'POST',
     headers:{ 'apikey': SUPABASE_KEY, 'Content-Type':'application/json' },
     body: JSON.stringify({ refresh_token: rt })
   }).then(function(r){ return r.ok ? r.json() : null; });
 }
+// read tokens from the magic-link redirect (#access_token=...&refresh_token=...)
+function sessionFromHash(){
+  var h = location.hash || '';
+  if(h.indexOf('access_token') !== -1){
+    var p = new URLSearchParams(h.slice(1));
+    return { access_token: p.get('access_token'), refresh_token: p.get('refresh_token') };
+  }
+  if(h.indexOf('error') !== -1){
+    var e = new URLSearchParams(h.slice(1));
+    return { error: e.get('error_description') || e.get('error') || 'Sign-in link error' };
+  }
+  return null;
+}
+function cleanUrl(){ try { history.replaceState(null, '', location.pathname); } catch(e){} }
 
 // --- leads ---
 function getLeads(token){
-  return fetch(SUPABASE_URL + '/rest/v1/club_leads?select=*&order=created_at.desc', {
-    headers: authHeaders(token)
-  });
+  return fetch(SUPABASE_URL + '/rest/v1/club_leads?select=*&order=created_at.desc', { headers: authHeaders(token) });
 }
-
 function setState(html){ if(html){ stateMsg.innerHTML = html; stateMsg.hidden = false; } else { stateMsg.hidden = true; } }
-
 function camClass(v){ v=(v||'').toLowerCase(); if(v.indexOf('yes')===0) return 'yes'; if(v.indexOf('no')===0) return 'no'; return 'maybe'; }
-
 function fmtDate(s){ if(!s) return '—'; var d=new Date(s); if(isNaN(d)) return s;
   return d.toLocaleString(undefined,{year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}); }
-
 function cell(text, cls){ var td=document.createElement('td'); if(cls) td.className=cls;
   td.textContent = (text===null||text===undefined||text==='') ? '—' : String(text); return td; }
 function linkCell(value, href){ var td=document.createElement('td');
@@ -222,42 +233,41 @@ function render(rows){
 function loadLeads(){
   var s = getSession();
   if(!s || !s.access_token){ showLogin(); return; }
-  setState('<div class="spinner"></div>Loading leads…');
+  showApp(); setState('<div class="spinner"></div>Loading leads…');
   getLeads(s.access_token).then(function(res){
     if(res.status === 401){
-      // try a token refresh, then retry once
       return refreshToken(s.refresh_token).then(function(nt){
-        if(!nt || !nt.access_token){ clearSession(); showLogin('Your session expired. Please sign in again.'); return null; }
-        setSession(nt);
-        return getLeads(nt.access_token);
+        if(!nt || !nt.access_token){ clearSession(); showLogin('Your session expired. Request a new sign-in link.'); return null; }
+        setSession(nt); return getLeads(nt.access_token);
       });
     }
     return res;
   }).then(function(res){
     if(!res) return;
-    if(res.status === 401 || res.status === 403){ clearSession(); showLogin('Your session expired. Please sign in again.'); return; }
-    if(!res.ok){ setState('Could not load leads (HTTP ' + res.status + '). If this persists, the read policy may be missing.'); return; }
-    return res.json().then(function(rows){ showApp(); render(rows); });
+    if(res.status === 401 || res.status === 403){ clearSession(); showLogin('Your session expired. Request a new sign-in link.'); return; }
+    if(!res.ok){ setState('Could not load leads (HTTP ' + res.status + '). If this persists, the read policy may be missing for your email.'); return; }
+    return res.json().then(function(rows){ render(rows); });
   }).catch(function(){ setState('Network error loading leads. Try Refresh.'); });
 }
 
 // --- events ---
 loginForm.addEventListener('submit', function(e){
   e.preventDefault();
-  loginError.classList.remove('show');
+  loginError.classList.remove('show'); loginSent.classList.remove('show');
   var email = document.getElementById('email').value.trim();
-  var password = document.getElementById('password').value;
-  loginBtn.disabled = true; loginBtn.textContent = 'Signing in…';
-  signIn(email, password).then(function(r){
-    loginBtn.disabled = false; loginBtn.textContent = 'Sign in';
+  loginBtn.disabled = true; loginBtn.textContent = 'Sending…';
+  sendMagicLink(email).then(function(r){
+    loginBtn.disabled = false; loginBtn.textContent = 'Email me a login link';
     if(!r.ok){
-      var msg = (r.body && (r.body.error_description || r.body.msg || r.body.error)) || 'Invalid email or password.';
-      loginError.textContent = msg; loginError.classList.add('show'); return;
+      return r.json().then(function(j){
+        var msg = (j && (j.error_description || j.msg || j.error)) || 'Could not send the link. Is this an authorised admin email?';
+        loginError.textContent = msg; loginError.classList.add('show');
+      }).catch(function(){ loginError.textContent = 'Could not send the link.'; loginError.classList.add('show'); });
     }
-    setSession(r.body);
-    loadLeads();
+    document.getElementById('sentTo').textContent = email;
+    loginSent.classList.add('show');
   }).catch(function(){
-    loginBtn.disabled = false; loginBtn.textContent = 'Sign in';
+    loginBtn.disabled = false; loginBtn.textContent = 'Email me a login link';
     loginError.textContent = 'Network error. Please try again.'; loginError.classList.add('show');
   });
 });
@@ -265,8 +275,14 @@ loginForm.addEventListener('submit', function(e){
 document.getElementById('logoutBtn').addEventListener('click', function(){ clearSession(); showLogin(); });
 document.getElementById('refreshBtn').addEventListener('click', loadLeads);
 
-// on load: resume session if present, else show login
-if(getSession()){ loadLeads(); } else { showLogin(); }
+// --- init: handle magic-link callback, else resume session, else login ---
+(function init(){
+  var h = sessionFromHash();
+  if(h && h.error){ cleanUrl(); showLogin('That sign-in link was invalid or expired. Request a new one.'); return; }
+  if(h && h.access_token){ setSession(h); cleanUrl(); loadLeads(); return; }
+  if(getSession()){ loadLeads(); return; }
+  showLogin();
+})();
 </script>
 </body>
 </html>
