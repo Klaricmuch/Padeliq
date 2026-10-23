@@ -877,9 +877,40 @@ const barIO = new IntersectionObserver((entries) => {
 const bars = document.getElementById('bars');
 if (bars) barIO.observe(bars);
 
-// email signups -> Supabase (email_signups), best-effort; always show the thank-you
+// email signups -> Supabase (email_signups) + email notification via /api/notify (fallback).
+// Optimistic UX (always thanks); you still get the signup by email even if the DB write fails.
 var SUPABASE_URL = 'https://dybyhptwmzjadeysylbo.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_TDhGCwyAGsgb0l4ntcmq0A_dmadouAk';
+
+function timedFetch(url, opts, ms) {
+  var ctrl = new AbortController();
+  var t = setTimeout(function () { ctrl.abort(); }, ms || 8000);
+  var o = {}; for (var k in opts) o[k] = opts[k]; o.signal = ctrl.signal;
+  return fetch(url, o).then(
+    function (r) { clearTimeout(t); return r; },
+    function (e) { clearTimeout(t); throw e; }
+  );
+}
+
+// Tries the DB insert, then ALWAYS emails via /api/notify. Resolves true if captured by either.
+function submitLead(type, payload, insertUrl) {
+  var saved = false;
+  return timedFetch(insertUrl, {
+    method: 'POST',
+    headers: {
+      'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY,
+      'Content-Type': 'application/json', 'Prefer': 'return=minimal'
+    },
+    body: JSON.stringify(payload)
+  }, 8000).then(function (r) { saved = r.ok; }, function () { saved = false; })
+  .then(function () {
+    return timedFetch('/api/notify', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: type, saved: saved, data: payload })
+    }, 10000).then(function (r) { return saved || r.ok; }, function () { return saved; });
+  });
+}
+
 function wireForm(formId, source) {
   const form = document.getElementById(formId);
   if (!form) return;
@@ -889,14 +920,7 @@ function wireForm(formId, source) {
     const email = input ? input.value.trim() : '';
     form.classList.add('done');
     if (!email) return;
-    fetch(SUPABASE_URL + '/rest/v1/email_signups', {
-      method: 'POST',
-      headers: {
-        'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY,
-        'Content-Type': 'application/json', 'Prefer': 'return=minimal'
-      },
-      body: JSON.stringify({ email: email, source: source })
-    }).catch(() => {});
+    submitLead('home', { email: email, source: source }, SUPABASE_URL + '/rest/v1/email_signups');
   });
 }
 wireForm('heroForm', 'home-hero');
