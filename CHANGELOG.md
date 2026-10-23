@@ -5,6 +5,18 @@ the change and the decision/reasoning behind it, so the history travels with the
 
 ---
 
+## 2026-10-23 — Hardened PostHog API key (rotated + stored as Secret)
+
+- Vercel flagged `POSTHOG_API_KEY` as plaintext ("value is visible to anyone with access").
+  Rotated the key at PostHog (created a new personal key, deleted the old one) and re-added it in
+  Vercel as a **Secret** (write-only) env var across Production + Preview, then redeployed.
+  - *Why:* a plaintext server env var is readable by anyone with Vercel project access; rotating
+    kills the previously-exposed value and the Secret type makes the new one unreadable in the UI.
+  - *Verified:* `/api/stats` returns `200` with live view/visitor counts — the new key works in the
+    deployment and the admin dashboard numbers are back. Config-only; nothing in this repo changed.
+
+---
+
 ## 2026-10-23 — Resilience: Supabase keep-alive + email fallback on every submit
 
 Make lead capture survive a paused/down Supabase so a submission is never silently lost.
