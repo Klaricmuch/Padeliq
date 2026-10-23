@@ -5,6 +5,34 @@ the change and the decision/reasoning behind it, so the history travels with the
 
 ---
 
+## 2026-10-23 — Resilience: Supabase keep-alive + email fallback on every submit
+
+Make lead capture survive a paused/down Supabase so a submission is never silently lost.
+
+- **Keep-alive (GitHub Action).** `.github/workflows/supabase-keepalive.yml` pings the Supabase
+  REST API once a day (and on demand via *Actions → Run workflow*). Credentials come from repo
+  secrets `SUPABASE_URL` / `SUPABASE_KEY` — **not** committed to code. Fails loudly (red run +
+  `::error::`) if the DB is unreachable, so a pause is visible.
+  - *Why GitHub Action over Vercel cron:* independent of the app, free on a public repo, and the
+    failure surfaces in the Actions tab. Note: GitHub auto-disables schedules after 60 days of
+    repo inactivity — regular commits keep it on.
+- **Email fallback (`api/notify.js`, Resend).** New serverless endpoint that emails every lead.
+  Both forms call it on **every** submit with `{type, saved, data}`. If the DB write failed the
+  subject is prefixed `⚠️ [DB FAILED]` and the body flags that the email is the only copy — so a
+  paused DB still gets the lead to the inbox. (The Slack notification is a DB trigger, so it does
+  *not* fire when the write fails; email is the safety net.) Config via Vercel env:
+  `RESEND_API_KEY`, `LEAD_NOTIFY_TO` (comma-sep), optional `LEAD_NOTIFY_FROM`.
+- **Form error handling.** `index.html` + `clubs/index.html` now wrap the DB write in an
+  `AbortController` timeout (8s) and **always** POST `/api/notify` afterwards. A submit succeeds
+  if *either* the DB write *or* the email succeeds; the error message shows only if both fail —
+  no silent failures, and a hung/paused DB can't freeze the UI.
+  - *Verified:* `/api/notify` is live in production (returns the "Email not configured" 500 until
+    the Resend env vars are set — confirms deploy). First keep-alive run went **red** and
+    revealed the project is currently **paused** (`NXDOMAIN` on the project host) — needs a manual
+    restore in the Supabase dashboard; the daily ping prevents re-pausing afterwards.
+
+---
+
 ## 2026-08-05 — Auth emails via Resend (custom SMTP)
 
 - Configured the new Supabase project's Auth emails to send via **Resend** custom SMTP (from
